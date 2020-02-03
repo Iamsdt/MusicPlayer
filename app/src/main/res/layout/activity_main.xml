@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Developed By Shudipto Trafder
+  ~ on 8/17/18 12:49 PM
+  ~ Copyright (c) 2018 Shudipto Trafder.
+  -->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.MainUIActivity">
+
+    <include layout="@layout/content_main_splash" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
