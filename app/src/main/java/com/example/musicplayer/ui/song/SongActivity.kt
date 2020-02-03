@@ -8,7 +8,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Song
+import com.example.musicplayer.ext.toTrack
 import com.example.musicplayer.ui.main.ClickListener
+import com.example.player.IPlayer
+import com.example.player.Player
 import kotlinx.android.synthetic.main.activity_artist_list.*
 import kotlinx.android.synthetic.main.content_artist_list.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -18,6 +21,8 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
     private val vm: SongVM by viewModel()
 
     private var title: String = ""
+
+    private val list: ArrayList<IPlayer.Track> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +35,9 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
         toolbar.title = title
         //set action toolbar
         setSupportActionBar(toolbar)
+
+        //init player
+        Player.init(this)
 
         //layout manager
         val manager = LinearLayoutManager(this)
@@ -46,14 +54,22 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
 
         vm.getSongs(albumID).observe(this, Observer {
             adapter.submitList(it)
+            preparePlayList(it)
         })
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    private fun preparePlayList(it: List<Song>?) {
+        //clear all previous data
+        list.clear()
+        it?.forEach { list.add(it.toTrack()) }
+        Player.playList = list
+    }
+
 
     override fun click(model: Song) {
-        //todo implement play
+        Player.start(model.id.toString())
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

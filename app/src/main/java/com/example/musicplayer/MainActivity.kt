@@ -57,6 +57,6 @@ class MainActivity : AppCompatActivity() {
 
     //goto next activity
     private fun next() {
-        nextActivity<MainUIActivity>()
+        nextActivity<MainUIActivity>(finish = true)
     }
 }
