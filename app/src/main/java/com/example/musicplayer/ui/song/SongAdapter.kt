@@ -1,4 +1,4 @@
-package com.example.musicplayer.ui.artist
+package com.example.musicplayer.ui.song
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,18 +6,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.musicplayer.R
-import com.example.musicplayer.data.model.Artist
+import com.example.musicplayer.data.model.Song
 import com.example.musicplayer.ui.main.ClickListener
 
-class ArtistAdapter(private val context: Context, private val listener: ClickListener<Artist>) :
-    ListAdapter<Artist, ArtistVH>(diff) {
+class SongAdapter(private val context: Context, private val listener: ClickListener<Song>) :
+    ListAdapter<Song, SongVH>(diff) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistVH {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongVH {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
-        return ArtistVH(view)
+        return SongVH(view)
     }
 
-    override fun onBindViewHolder(holder: ArtistVH, position: Int) {
+    override fun onBindViewHolder(holder: SongVH, position: Int) {
         val model = getItem(position)
 
         if (model != null) {
@@ -32,12 +32,12 @@ class ArtistAdapter(private val context: Context, private val listener: ClickLis
 
 
     companion object {
-        val diff = object : DiffUtil.ItemCallback<Artist>() {
-            override fun areItemsTheSame(oldItem: Artist, newItem: Artist): Boolean {
+        val diff = object : DiffUtil.ItemCallback<Song>() {
+            override fun areItemsTheSame(oldItem: Song, newItem: Song): Boolean {
                 return oldItem == newItem
             }
 
-            override fun areContentsTheSame(oldItem: Artist, newItem: Artist): Boolean {
+            override fun areContentsTheSame(oldItem: Song, newItem: Song): Boolean {
                 return oldItem.id == newItem.id
             }
 

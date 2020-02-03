@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -65,5 +67,13 @@ dependencies {
 
     //error handler
     implementation 'com.github.RohitSurwase.UCE-Handler:uce_handler:1.4'
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'
+
+
+    //circular image view
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
 }

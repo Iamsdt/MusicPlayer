@@ -24,6 +24,11 @@
             android:name=".ui.artist.ArtistListActivity"
             android:label="@string/title_activity_artist_list"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.song.SongActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.main.MainUIActivity"
             android:label="@string/app_name"

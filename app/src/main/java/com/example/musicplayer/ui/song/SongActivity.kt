@@ -1,4 +1,4 @@
-package com.example.musicplayer.ui.artist
+package com.example.musicplayer.ui.song
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -7,28 +7,35 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.R
-import com.example.musicplayer.data.model.Artist
+import com.example.musicplayer.data.model.Song
 import com.example.musicplayer.ui.main.ClickListener
-import com.example.musicplayer.ui.song.SongActivity
-import com.iamsdt.androidextension.nextActivity
 import kotlinx.android.synthetic.main.activity_artist_list.*
 import kotlinx.android.synthetic.main.content_artist_list.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ArtistListActivity : AppCompatActivity(), ClickListener<Artist> {
+class SongActivity : AppCompatActivity(), ClickListener<Song> {
 
-    private val vm: ArtistVM by viewModel()
+    private val vm: SongVM by viewModel()
+
+    private var title: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_artist_list)
+
+        val albumID = intent.getLongExtra("AlbumId", 0)
+
+        title = intent.getStringExtra("AlbumName") ?: ""
+        //set title
+        toolbar.title = title
+        //set action toolbar
         setSupportActionBar(toolbar)
 
         //layout manager
         val manager = LinearLayoutManager(this)
         artistRCV.layoutManager = manager
         //setup rev
-        val adapter = ArtistAdapter(this, this)
+        val adapter = SongAdapter(this, this)
         artistRCV.adapter = adapter
         // set item
         val dividerItemDecoration = DividerItemDecoration(
@@ -37,7 +44,7 @@ class ArtistListActivity : AppCompatActivity(), ClickListener<Artist> {
         )
         artistRCV.addItemDecoration(dividerItemDecoration)
 
-        vm.getArtists().observe(this, Observer {
+        vm.getSongs(albumID).observe(this, Observer {
             adapter.submitList(it)
         })
 
@@ -45,15 +52,8 @@ class ArtistListActivity : AppCompatActivity(), ClickListener<Artist> {
     }
 
 
-    override fun click(model: Artist) {
-        val map = mapOf(
-            Pair("AlbumId", model.id),
-            Pair("AlbumName", model.name)
-        )
-
-        nextActivity<SongActivity>(
-            list = map
-        )
+    override fun click(model: Song) {
+        //todo implement play
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
