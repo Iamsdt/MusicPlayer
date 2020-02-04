@@ -20,11 +20,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <receiver android:name=".widget.PlayListWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/play_list_widget_info" />
+        </receiver>
+
+        <activity android:name=".widget.PlayListWidgetConfigureActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.artist.ArtistListActivity"
             android:label="@string/title_activity_artist_list"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".ui.song.SongActivity"
             android:label="@string/app_name"
@@ -33,7 +47,6 @@
             android:name=".ui.main.MainUIActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

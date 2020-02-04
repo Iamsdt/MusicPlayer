@@ -48,4 +48,7 @@
     <string name="loading">Loading…</string>
     <string name="media_route_menu_title">Play on…</string>
     <string name="title_activity_artist_list">Artists</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Select your favourite playlist?</string>
+    <string name="add_widget">Click to select</string>
 </resources>

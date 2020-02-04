@@ -1,6 +1,7 @@
 package com.example.musicplayer.ui.song
 
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -21,6 +22,7 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
     private val vm: SongVM by viewModel()
 
     private var title: String = ""
+    private var playImmediately = false
 
     private val list: ArrayList<IPlayer.Track> = ArrayList()
 
@@ -28,9 +30,10 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_artist_list)
 
-        val albumID = intent.getLongExtra("AlbumId", 0)
+        val artistID = intent.getLongExtra("ArtistID", 0)
 
-        title = intent.getStringExtra("AlbumName") ?: ""
+        title = intent.getStringExtra("ArtistName") ?: ""
+        playImmediately = intent.getBooleanExtra("requestForPlay", false)
         //set title
         toolbar.title = title
         //set action toolbar
@@ -52,7 +55,7 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
         )
         artistRCV.addItemDecoration(dividerItemDecoration)
 
-        vm.getSongs(albumID).observe(this, Observer {
+        vm.getSongs(artistID).observe(this, Observer {
             adapter.submitList(it)
             preparePlayList(it)
         })
@@ -65,17 +68,29 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
         list.clear()
         it?.forEach { list.add(it.toTrack()) }
         Player.playList = list
+
+        if (playImmediately && list.isNotEmpty()) {
+            Player.start(list[0].id)
+        }
     }
 
 
     override fun click(model: Song) {
         Player.start(model.id.toString())
+        //Player.play()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.songs_menu, menu)
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         if (item.itemId == android.R.id.home) {
             onBackPressed()
+        } else if ((item.itemId == R.id.action_play)) {
+            Player.play()
         }
 
         return super.onOptionsItemSelected(item)

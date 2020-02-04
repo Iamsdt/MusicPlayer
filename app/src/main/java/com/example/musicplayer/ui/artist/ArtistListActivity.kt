@@ -47,8 +47,8 @@ class ArtistListActivity : AppCompatActivity(), ClickListener<Artist> {
 
     override fun click(model: Artist) {
         val map = mapOf(
-            Pair("AlbumId", model.id),
-            Pair("AlbumName", model.name)
+            Pair("ArtistID", model.id),
+            Pair("ArtistName", model.name)
         )
 
         nextActivity<SongActivity>(
