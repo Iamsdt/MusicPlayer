@@ -1,4 +1,4 @@
-package com.example.musicplayer.ui.song
+package com.example.musicplayer.ui.songs
 
 import android.content.Context
 import android.view.LayoutInflater

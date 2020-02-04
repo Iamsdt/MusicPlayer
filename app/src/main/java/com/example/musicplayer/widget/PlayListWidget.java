@@ -9,7 +9,7 @@ import android.widget.RemoteViews;
 
 import com.example.musicplayer.R;
 import com.example.musicplayer.data.model.Playlist;
-import com.example.musicplayer.ui.song.SongActivity;
+import com.example.musicplayer.ui.songs.SongActivity;
 import com.example.musicplayer.utils.SPUtils;
 
 /**

@@ -5,14 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.musicplayer.data.model.Artist
-import com.example.musicplayer.data.repo.ArtistsRepository
+import com.example.musicplayer.data.model.Album
+import com.example.musicplayer.data.repo.AlbumsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AlbumVM(private val context: Context) : ViewModel() {
 
-    private val artists: MutableLiveData<List<Artist>> = MutableLiveData()
+    private val artists: MutableLiveData<List<Album>> = MutableLiveData()
 
     init {
         update()
@@ -20,12 +20,12 @@ class AlbumVM(private val context: Context) : ViewModel() {
 
     private fun update() {
         viewModelScope.launch(Dispatchers.IO) {
-            val list = ArtistsRepository.getInstance(context)!!.getAllArtist()
+            val list = AlbumsRepository.getInstance(context)!!.getAlbums()
             artists.postValue(list)
         }
     }
 
-    fun getArtists(): LiveData<List<Artist>> {
+    fun getAlbums(): LiveData<List<Album>> {
         return artists
     }
 }

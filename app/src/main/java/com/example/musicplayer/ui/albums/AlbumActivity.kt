@@ -1,4 +1,4 @@
-package com.example.musicplayer.ui.artist
+package com.example.musicplayer.ui.albums
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -7,7 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.R
-import com.example.musicplayer.data.model.Artist
+import com.example.musicplayer.data.model.Album
 import com.example.musicplayer.ui.main.ClickListener
 import com.example.musicplayer.ui.songs.SongActivity
 import com.example.musicplayer.utils.Constants
@@ -16,9 +16,9 @@ import kotlinx.android.synthetic.main.activity_artist_list.*
 import kotlinx.android.synthetic.main.content_artist_list.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ArtistListActivity : AppCompatActivity(), ClickListener<Artist> {
+class AlbumActivity : AppCompatActivity(), ClickListener<Album> {
 
-    private val vm: ArtistVM by viewModel()
+    private val vm: AlbumVM by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ class ArtistListActivity : AppCompatActivity(), ClickListener<Artist> {
         val manager = LinearLayoutManager(this)
         artistRCV.layoutManager = manager
         //setup rev
-        val adapter = ArtistAdapter(this, this)
+        val adapter = AlbumAdapter(this, this)
         artistRCV.adapter = adapter
         // set item
         val dividerItemDecoration = DividerItemDecoration(
@@ -38,7 +38,7 @@ class ArtistListActivity : AppCompatActivity(), ClickListener<Artist> {
         )
         artistRCV.addItemDecoration(dividerItemDecoration)
 
-        vm.getArtists().observe(this, Observer {
+        vm.getAlbums().observe(this, Observer {
             adapter.submitList(it)
         })
 
@@ -46,11 +46,11 @@ class ArtistListActivity : AppCompatActivity(), ClickListener<Artist> {
     }
 
 
-    override fun click(model: Artist) {
+    override fun click(model: Album) {
         val map = mapOf(
-            Pair(Constants.Type.Type, Constants.Type.TypeArtist),
-            Pair(Constants.Artist.ArtistID, model.id),
-            Pair(Constants.Artist.ArtistName, model.name)
+            Pair(Constants.Type.Type, Constants.Type.TypeAlbums),
+            Pair(Constants.Album.AlbumID, model.id),
+            Pair(Constants.Album.AlbumName, model.title)
         )
 
         nextActivity<SongActivity>(

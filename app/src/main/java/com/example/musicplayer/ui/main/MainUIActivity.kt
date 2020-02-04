@@ -10,10 +10,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.musicplayer.MainActivity
 import com.example.musicplayer.R
 import com.example.musicplayer.data.MainListData
 import com.example.musicplayer.data.MainListItem
+import com.example.musicplayer.ui.albums.AlbumActivity
 import com.example.musicplayer.ui.artist.ArtistListActivity
+import com.example.musicplayer.ui.playlist.PlaylistActivity
 import com.google.android.material.navigation.NavigationView
 import com.iamsdt.androidextension.nextActivity
 import kotlinx.android.synthetic.main.activity_main_ui.*
@@ -67,10 +70,10 @@ class MainUIActivity : AppCompatActivity(),
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.all_music -> {
-                //todo all music
+                nextActivity<MainActivity>()
             }
             R.id.playlist -> {
-                //todo playlist
+                nextActivity<PlaylistActivity>()
             }
         }
 
@@ -81,6 +84,8 @@ class MainUIActivity : AppCompatActivity(),
     override fun click(model: MainListItem) {
         when (model.id) {
             1 -> nextActivity<ArtistListActivity>()
+            2 -> nextActivity<AlbumActivity>()
+            3 -> nextActivity<PlaylistActivity>()
             else -> {
                 //nothing to do
             }

@@ -1,5 +1,6 @@
-package com.example.musicplayer.ui.song
+package com.example.musicplayer.ui.songs
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,6 +12,7 @@ import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Song
 import com.example.musicplayer.ext.toTrack
 import com.example.musicplayer.ui.main.ClickListener
+import com.example.musicplayer.utils.Constants
 import com.example.player.IPlayer
 import com.example.player.Player
 import kotlinx.android.synthetic.main.activity_artist_list.*
@@ -22,7 +24,9 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
     private val vm: SongVM by viewModel()
 
     private var title: String = ""
+    private var type: String = ""
     private var playImmediately = false
+    private var id: Long = 0L
 
     private val list: ArrayList<IPlayer.Track> = ArrayList()
 
@@ -30,9 +34,8 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_artist_list)
 
-        val artistID = intent.getLongExtra("ArtistID", 0)
+        loadTypeData(intent)
 
-        title = intent.getStringExtra("ArtistName") ?: ""
         playImmediately = intent.getBooleanExtra("requestForPlay", false)
         //set title
         toolbar.title = title
@@ -55,13 +58,35 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
         )
         artistRCV.addItemDecoration(dividerItemDecoration)
 
-        vm.getSongs(artistID).observe(this, Observer {
+        vm.getSongs(id, type).observe(this, Observer {
             adapter.submitList(it)
             preparePlayList(it)
         })
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
+
+    private fun loadTypeData(intent: Intent) {
+        type = intent.getStringExtra(Constants.Type.Type) ?: ""
+        when (type) {
+            Constants.Type.TypeAlbums -> {
+                id = intent.getLongExtra(Constants.Album.AlbumID, 0)
+                title = intent.getStringExtra(Constants.Album.AlbumName) ?: ""
+            }
+
+            Constants.Type.TypeArtist -> {
+                id = intent.getLongExtra(Constants.Artist.ArtistID, 0)
+                title = intent.getStringExtra(Constants.Artist.ArtistName) ?: ""
+            }
+
+            Constants.Type.TypePlaylist -> {
+                id = intent.getLongExtra(Constants.Playlist.PlaylistID, 0)
+                title = intent.getStringExtra(Constants.Playlist.PlaylistName) ?: ""
+            }
+
+        }
+    }
+
 
     private fun preparePlayList(it: List<Song>?) {
         //clear all previous data
