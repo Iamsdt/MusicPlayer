@@ -7,9 +7,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Playlist
-import com.example.musicplayer.ui.main.ClickListener
 
-class PlaylistAdapter(private val context: Context, private val listener: ClickListener<Playlist>) :
+class PlaylistAdapter(private val context: Context, private val listener: PlayistClickListener) :
     ListAdapter<Playlist, PlaylistVH>(diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistVH {
@@ -24,6 +23,10 @@ class PlaylistAdapter(private val context: Context, private val listener: ClickL
             holder.bind(model, context)
             holder.itemView.setOnClickListener {
                 listener.click(model)
+            }
+            holder.itemView.setOnLongClickListener {
+                listener.longClick(model)
+                true
             }
         }
 

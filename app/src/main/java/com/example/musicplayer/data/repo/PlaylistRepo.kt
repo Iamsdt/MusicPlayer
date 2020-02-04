@@ -12,6 +12,7 @@ import android.provider.MediaStore.Audio.PlaylistsColumns.NAME
 import android.util.Log
 import com.example.musicplayer.data.model.Playlist
 import com.example.musicplayer.data.model.Song
+import com.example.musicplayer.ext.ContentProviderLiveData
 import com.example.musicplayer.ext.toList
 import com.example.musicplayer.utils.SettingsUtility
 
@@ -167,6 +168,11 @@ class PlaylistRepository() : PlaylistRepositoryInterface {
             Log.println(Log.ERROR, "Exception", ex.message!!)
         }
         return null
+    }
+
+    fun getLivePlaylist(context: Context): ContentLiveData {
+        val uri = EXTERNAL_CONTENT_URI
+        return ContentLiveData(uri, context)
     }
 
     private fun getSongCountForPlaylist(playlistId: Long): Int {

@@ -1,7 +1,10 @@
 package com.example.musicplayer.ui.playlist
 
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -9,8 +12,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Playlist
+import com.example.musicplayer.data.repo.ContentLiveData
 import com.example.musicplayer.data.repo.PlaylistRepository
-import com.example.musicplayer.ui.main.ClickListener
 import com.example.musicplayer.ui.songs.SongActivity
 import com.example.musicplayer.utils.Constants
 import com.iamsdt.androidextension.MyCoroutineContext
@@ -19,17 +22,13 @@ import com.iamsdt.androidextension.nextActivity
 import com.iamsdt.androidextension.show
 import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_playlist.*
-import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_playlist.*
 import kotlinx.android.synthetic.main.playlist_dialogs.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class PlaylistActivity : AppCompatActivity(), ClickListener<Playlist> {
-
-    private val vm: PlaylistVM by viewModel()
+class PlaylistActivity : AppCompatActivity(), PlayistClickListener {
 
     private val uiScope = MyCoroutineContext()
 
@@ -53,12 +52,15 @@ class PlaylistActivity : AppCompatActivity(), ClickListener<Playlist> {
 
         //item decoration
         val dividerItemDecoration = DividerItemDecoration(
-            main_rcv.context,
+            this,
             manager.orientation
         )
         playlist_rcv.addItemDecoration(dividerItemDecoration)
 
-        vm.getPlaylist().observe(this, Observer {
+        val uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI
+        val provider = ContentLiveData(uri, this)
+        //observer provider
+        provider.observe(this, Observer {
             if (it == null || it.isEmpty()) {
                 emptyView()
             } else {
@@ -67,6 +69,16 @@ class PlaylistActivity : AppCompatActivity(), ClickListener<Playlist> {
                 adapter.submitList(it)
             }
         })
+
+        val list = provider.getContentProviderValue()
+        if (list.isEmpty()) {
+            emptyView()
+        } else {
+            regularView()
+            adapter.submitList(list)
+        }
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun showPlaylistDialog() {
@@ -115,6 +127,46 @@ class PlaylistActivity : AppCompatActivity(), ClickListener<Playlist> {
         )
 
         nextActivity<SongActivity>(list = map)
+    }
+
+    override fun longClick(model: Playlist) {
+        showWarning(model)
+    }
+
+    private fun showWarning(model: Playlist) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete?")
+        builder.setMessage("Are you want to delete ${model.name} playlist?")
+        builder.setPositiveButton("yes") { dialog, which ->
+            val repo = PlaylistRepository.getInstance(this)
+            uiScope.launch(Dispatchers.IO) {
+                repo?.deletePlaylist(model.id)
+
+            }
+        }
+
+        builder.setNegativeButton("cancel") { _, _ ->
+            //nothing to do
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.playlist_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+        } else if (item.itemId == R.id.action_add) {
+            showPlaylistDialog()
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
 }

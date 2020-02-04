@@ -70,7 +70,7 @@ class MainUIActivity : AppCompatActivity(),
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.all_music -> {
-                nextActivity<MainActivity>()
+                nextActivity<MainActivity>(finish = true)
             }
             R.id.playlist -> {
                 nextActivity<PlaylistActivity>()

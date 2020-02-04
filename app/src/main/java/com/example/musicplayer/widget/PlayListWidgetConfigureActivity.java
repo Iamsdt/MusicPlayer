@@ -12,10 +12,10 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.example.musicplayer.R;
 import com.example.musicplayer.data.model.Playlist;
+import com.example.musicplayer.data.repo.PlaylistRepository;
 import com.example.musicplayer.utils.SPUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
@@ -75,10 +75,10 @@ public class PlayListWidgetConfigureActivity extends Activity implements View.On
         Context context = PlayListWidgetConfigureActivity.this;
 
         //todo replace empty list
-        List<Playlist> mList = Collections.emptyList();
+        List<Playlist> mList = PlaylistRepository.Companion.getInstance(this).getPlayLists();
 
         if (mList.isEmpty()) {
-            Toasty.warning(context, "No playlist", Toast.LENGTH_LONG).show();
+            Toasty.warning(context, "No playlist, please create new and add the widget again", Toast.LENGTH_LONG).show();
             return;
         }
 

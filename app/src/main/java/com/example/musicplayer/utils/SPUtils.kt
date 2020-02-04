@@ -16,7 +16,7 @@ class SPUtils {
 
             return Playlist(
                 id = sp.getLong("PlaylistID", 0),
-                name = sp.getString("PlaylistID", "") ?: "",
+                name = sp.getString("PlaylistName", "") ?: "",
                 songCount = sp.getInt("PlaylistSongs", 0)
             )
         }
@@ -24,7 +24,7 @@ class SPUtils {
         fun savePlaylist(playlist: Playlist, context: Context, appWidgetId: Int) {
             getSp(context, "Playlist$appWidgetId").edit {
                 putLong("PlaylistID", playlist.id)
-                putString("PlaylistID", playlist.name)
+                putString("PlaylistName", playlist.name)
                 putInt("PlaylistSongs", playlist.songCount)
             }
         }

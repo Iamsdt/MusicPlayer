@@ -23,7 +23,7 @@
         <activity
             android:name=".ui.playlist.PlaylistActivity"
             android:label="@string/title_activity_playlist"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <receiver android:name=".widget.PlayListWidget">
             <intent-filter>
@@ -55,7 +55,6 @@
         <activity
             android:name=".ui.main.MainUIActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
