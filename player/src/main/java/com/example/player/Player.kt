@@ -28,6 +28,8 @@ object Player : IPlayer {
     }
 
     override val liveDataPlayerState get() = playerImpl.liveDataPlayerState
+    override val progresLiveData: LiveData<Long>
+        get() = playerImpl.progresLiveData
     override val liveDataPlayNow get() = playerImpl.liveDataPlayNow
     override val liveDataPlayList get() = playerImpl.liveDataPlayList
     override val trackDuration get() = playerImpl.trackDuration
@@ -54,6 +56,9 @@ object Player : IPlayer {
 }
 
 private class PlayerImpl(private val appContext: Context) : IPlayer {
+
+    val mProgress = MutableLiveData<Long>()
+
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback()
     private val mediaBrowser = MediaBrowserCompat(
         appContext,
@@ -63,8 +68,10 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
         .apply { connect() }
     private var mediaController: MediaControllerCompat? = null
     private val _liveDataPlayerState =
-        MutableLiveData<IPlayer.State>().apply { postValue(State.PREPARING) }
+        MutableLiveData<State>().apply { postValue(State.PREPARING) }
     override val liveDataPlayerState: LiveData<State> get() = _liveDataPlayerState
+    override val progresLiveData: LiveData<Long>
+        get() = mProgress
     private val state: State get() = _liveDataPlayerState.value ?: State.PREPARING
     private val _liveDataPlayNow = MutableLiveData<IPlayer.Track>()
     override val liveDataPlayNow: LiveData<IPlayer.Track> get() = _liveDataPlayNow
@@ -252,6 +259,10 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
             s?.takeIf { it != _liveDataPlayerState.value }?.also {
                 _liveDataPlayerState.postValue(it)
             }
+
+            //update position
+            val pos = state.getCurrentPosition(1000)
+            mProgress.postValue(pos)
         }
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {

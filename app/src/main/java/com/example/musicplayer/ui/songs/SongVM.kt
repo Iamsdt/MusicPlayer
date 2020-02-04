@@ -10,6 +10,7 @@ import com.example.musicplayer.data.repo.AlbumsRepository
 import com.example.musicplayer.data.repo.ArtistsRepository
 import com.example.musicplayer.data.repo.PlaylistRepository
 import com.example.musicplayer.utils.Constants
+import com.iamsdt.musicplayer.data.repository.SongsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -41,4 +42,6 @@ class SongVM(private val context: Context) : ViewModel() {
 
         return liveData
     }
+
+    fun getSong(songID: Long) = SongsRepository.getInstance(context)?.getSongForId(songID)
 }

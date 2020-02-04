@@ -21,6 +21,10 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".ui.play.PlayActivity"
+            android:label="@string/title_activity_play"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".ui.playlist.PlaylistActivity"
             android:label="@string/title_activity_playlist"
             android:theme="@style/AppTheme.NoActionBar" />

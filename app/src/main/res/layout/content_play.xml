@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".ui.play.PlayActivity"
+    tools:showIn="@layout/activity_play">
+
+    <ImageView
+        android:id="@+id/play_bcg"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:contentDescription="@string/background_image_str"
+        android:scaleType="centerCrop" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/fullscreen_bg_gradient">
+
+        <TextView
+            android:id="@+id/play_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/play_artist"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="20"
+            tools:text="This is example of line"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/fullscreen_line_color" />
+
+        <TextView
+            android:id="@+id/play_artist"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/play_album"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="20"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/fullscreen_secondary_line_color"
+            tools:text="This is example of line 2" />
+
+        <TextView
+            android:id="@+id/play_album"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/controllers"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="20"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/fullscreen_secondary_line_color"
+            tools:text="This is example of line 3" />
+
+        <LinearLayout
+            android:id="@+id/controllers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:layout_marginBottom="50dp"
+            android:visibility="visible">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp">
+
+                <TextView
+                    android:id="@+id/play_startText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="@dimen/text_view_margin"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    tools:text="0.0"
+                    android:textColor="@android:color/white" />
+
+                <SeekBar
+                    android:id="@+id/seekBar1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_toStartOf="@+id/play_endText"
+                    android:layout_toEndOf="@+id/play_startText" />
+
+                <TextView
+                    android:id="@+id/play_endText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_alignWithParentIfMissing="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/end_text_margin"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    tools:text="0.0"
+                    android:textColor="@android:color/white" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp">
+
+                <ImageView
+                    android:id="@+id/prev"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="?android:selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/skip_prev"
+                    android:src="@drawable/ic_skip_previous_white_48dp" />
+
+                <ImageView
+                    android:id="@+id/play_pause"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="?android:selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/play_pause"
+                    android:src="@drawable/uamp_ic_play_arrow_white_48dp" />
+
+                <ImageView
+                    android:id="@+id/next"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="?android:selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/skip_next"
+                    android:src="@drawable/ic_skip_next_white_48dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

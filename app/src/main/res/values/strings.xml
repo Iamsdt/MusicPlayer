@@ -54,4 +54,5 @@
     <string name="add_widget">Click to select</string>
     <string name="title_activity_playlist">Playlist</string>
     <string name="action_add">Add new playlist</string>
+    <string name="title_activity_play">PlayActivity</string>
 </resources>

@@ -6,6 +6,12 @@ class Constants {
         const val AlbumID = "AlbumID"
     }
 
+    object Songs {
+        const val Name = "Name"
+        const val ID = "ID"
+        const val SONG_ID = "Songs_ID"
+    }
+
     object Artist {
         const val ArtistName = "ArtistName"
         const val ArtistID = "ArtistID"

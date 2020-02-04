@@ -12,9 +12,11 @@ import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Song
 import com.example.musicplayer.ext.toTrack
 import com.example.musicplayer.ui.main.ClickListener
+import com.example.musicplayer.ui.play.PlayActivity
 import com.example.musicplayer.utils.Constants
 import com.example.player.IPlayer
 import com.example.player.Player
+import com.iamsdt.androidextension.nextActivity
 import kotlinx.android.synthetic.main.activity_artist_list.*
 import kotlinx.android.synthetic.main.content_artist_list.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -83,7 +85,6 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
                 id = intent.getLongExtra(Constants.Playlist.PlaylistID, 0)
                 title = intent.getStringExtra(Constants.Playlist.PlaylistName) ?: ""
             }
-
         }
     }
 
@@ -101,8 +102,14 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
 
 
     override fun click(model: Song) {
-        Player.start(model.id.toString())
-        //Player.play()
+        val map = mapOf(
+            Pair(Constants.Type.Type, type),
+            Pair(Constants.Songs.ID, id),
+            Pair(Constants.Songs.Name, title),
+            Pair(Constants.Songs.SONG_ID, model.id)
+        )
+
+        nextActivity<PlayActivity>(list = map)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

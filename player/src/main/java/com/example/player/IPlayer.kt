@@ -8,6 +8,7 @@ interface IPlayer {
     enum class State { PLAY, PAUSE, STOP, PREPARING, ERROR }
 
     val liveDataPlayerState: LiveData<State>
+    val progresLiveData: LiveData<Long>
     val liveDataPlayNow: LiveData<Track>
     val liveDataPlayList: LiveData<List<Track>>
     val trackDuration: Long
