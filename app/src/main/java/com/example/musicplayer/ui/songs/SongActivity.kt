@@ -2,25 +2,36 @@ package com.example.musicplayer.ui.songs
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Song
-import com.example.musicplayer.ui.main.ClickListener
+import com.example.musicplayer.data.repo.PlaylistRepository.Companion.getInstance
 import com.example.musicplayer.ui.play.PlayActivity
+import com.example.musicplayer.ui.playlist.LongClickListener
 import com.example.musicplayer.utils.Constants
+import com.iamsdt.androidextension.MyCoroutineContext
 import com.iamsdt.androidextension.nextActivity
+import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_artist_list.*
 import kotlinx.android.synthetic.main.content_artist_list.*
+import kotlinx.android.synthetic.main.playlist_dialogs.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
-class SongActivity : AppCompatActivity(), ClickListener<Song> {
+class SongActivity : AppCompatActivity(), LongClickListener<Song> {
 
     private val vm: SongVM by viewModel()
+    private val uiScope = MyCoroutineContext()
 
     private var title: String = ""
     private var type: String = ""
@@ -111,6 +122,78 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun longClick(model: Song) {
+        showPlaylistDialog(model)
+    }
+
+    private fun showPlaylistDialog(model: Song) {
+
+        val repo = getInstance(this)!!
+
+        val mList = repo.getPlayLists()
+
+        val list = ArrayList<String>()
+        list.add("Create new list")
+
+        for ((_, name) in mList) {
+            list.add(name)
+        }
+
+        val cs = list.toTypedArray<CharSequence>()
+
+        val builder =
+            AlertDialog.Builder(this)
+        builder.setTitle("Select a playlist")
+        builder.setItems(cs) { _, position ->
+            if (position == 0) {
+                showAddDialogPlaylistDialog()
+            } else {
+                val play = mList[position - 1]
+                uiScope.launch(Dispatchers.IO) {
+                    val int = repo.addToPlaylist(play.id, listOf(model.id).toLongArray())
+                    if (int > 0) {
+                        withContext(Dispatchers.Main) {
+                            Toasty.success(this@SongActivity, "Songs added successfully")
+                                .show()
+                        }
+                    }
+                }
+            }
+
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun showAddDialogPlaylistDialog() {
+        val builder = AlertDialog.Builder(this)
+        val view = LayoutInflater.from(this).inflate(
+            R.layout.playlist_dialogs, songs_root, false
+        )
+        builder.setView(view)
+        val dialog = builder.create()
+
+        view.playlist_dialog_btn.setOnClickListener {
+            val name = view.playlist_dialog_et.text.toString()
+            if (name.isEmpty()) {
+                Toasty.warning(this, "Please input valid name").show()
+            } else {
+                val repo = getInstance(this)
+                uiScope.launch(Dispatchers.IO) {
+                    repo?.createPlaylist(name)
+                    withContext(Dispatchers.Main) {
+                        if (dialog.isShowing) {
+                            dialog.dismiss()
+                        }
+                    }
+                }
+            }
+        }
+
+        dialog.show()
     }
 
 }

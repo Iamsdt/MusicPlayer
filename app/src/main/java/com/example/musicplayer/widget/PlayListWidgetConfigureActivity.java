@@ -91,7 +91,7 @@ public class PlayListWidgetConfigureActivity extends Activity implements View.On
         CharSequence[] cs = list.toArray(new CharSequence[list.size()]);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Select a text size");
+        builder.setTitle("Select a playlist");
         builder.setItems(cs, (dialog, position) -> {
             Playlist play = mList.get(position);
             SPUtils.Companion.savePlaylist(play, context, mAppWidgetId);

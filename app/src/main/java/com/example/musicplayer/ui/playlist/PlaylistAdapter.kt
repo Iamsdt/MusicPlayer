@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Playlist
 
-class PlaylistAdapter(private val context: Context, private val listener: PlayistClickListener) :
+class PlaylistAdapter(private val context: Context, private val listener: LongClickListener<Playlist>) :
     ListAdapter<Playlist, PlaylistVH>(diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistVH {

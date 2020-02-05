@@ -28,7 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class PlaylistActivity : AppCompatActivity(), PlayistClickListener {
+class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
 
     private val uiScope = MyCoroutineContext()
 
@@ -141,7 +141,6 @@ class PlaylistActivity : AppCompatActivity(), PlayistClickListener {
             val repo = PlaylistRepository.getInstance(this)
             uiScope.launch(Dispatchers.IO) {
                 repo?.deletePlaylist(model.id)
-
             }
         }
 

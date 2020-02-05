@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_play"
-        android:icon="@drawable/player_icon_play"
+        android:icon="@drawable/ic_playlist_music_black_24dp"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="always" />
