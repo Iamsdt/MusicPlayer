@@ -18,8 +18,8 @@ class MainVH(view: View) : RecyclerView.ViewHolder(view) {
         title.addTextK(model.title)
         subtitle.addTextK(model.subtitle)
 
-        if (model.imageID.isNotEmpty()) {
-            img.background = context.getDrawable(model.imageID.toInt())
+        if (model.imageID != 0) {
+            //img.background = context.getDrawable(model.imageID)
         }
     }
 

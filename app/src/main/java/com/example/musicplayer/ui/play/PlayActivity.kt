@@ -6,8 +6,8 @@ import android.os.Handler
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.bumptech.glide.Glide
 import com.example.musicplayer.R
+import com.example.musicplayer.data.DataHolder
 import com.example.musicplayer.data.model.Song
 import com.example.musicplayer.ext.toTrack
 import com.example.musicplayer.ui.songs.SongVM
@@ -15,6 +15,7 @@ import com.example.musicplayer.utils.Constants
 import com.example.player.IPlayer
 import com.example.player.Player
 import com.iamsdt.androidextension.MyCoroutineContext
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_play.*
 import kotlinx.android.synthetic.main.content_play.*
 import kotlinx.coroutines.delay
@@ -75,7 +76,7 @@ class PlayActivity : AppCompatActivity() {
         val newType = intent?.getStringExtra(Constants.Type.Type) ?: ""
         val newID = intent?.getLongExtra(Constants.Songs.ID, 0) ?: 0
         val newTitle = intent?.getStringExtra(Constants.Songs.Name) ?: ""
-        val newPlayImmediately = intent?.getBooleanExtra("requestForPlay", false) ?: false
+        val newPlayImmediately = intent?.getBooleanExtra("playlist", false) ?: false
         val newSongID = intent?.getLongExtra(Constants.Songs.SONG_ID, -10L) ?: 0
 
         if (id != newID) {
@@ -102,22 +103,27 @@ class PlayActivity : AppCompatActivity() {
         when (it) {
             IPlayer.State.PLAY -> {
                 play_pause.setImageDrawable(getDrawable(R.drawable.uamp_ic_pause_white_48dp))
+                DataHolder.getInstance().isPlaying = true
             }
 
             IPlayer.State.PAUSE -> {
                 play_pause.setImageDrawable(getDrawable(R.drawable.uamp_ic_play_arrow_white_48dp))
+                DataHolder.getInstance().isPlaying = false
             }
 
             IPlayer.State.ERROR -> {
                 play_pause.setImageDrawable(getDrawable(R.drawable.uamp_ic_play_arrow_white_48dp))
+                DataHolder.getInstance().isPlaying = false
             }
 
             IPlayer.State.STOP -> {
                 play_pause.setImageDrawable(getDrawable(R.drawable.uamp_ic_play_arrow_white_48dp))
+                DataHolder.getInstance().isPlaying = false
             }
 
             IPlayer.State.PREPARING -> {
                 play_pause.setImageDrawable(getDrawable(R.drawable.uamp_ic_play_arrow_white_48dp))
+                DataHolder.getInstance().isPlaying = false
             }
         }
 
@@ -147,10 +153,10 @@ class PlayActivity : AppCompatActivity() {
     private fun drawUI(it: IPlayer.Track?) {
         if (it == null) return
 
-        Glide.with(this)
+        Picasso.get()
             .load(it.imageUri)
-            .placeholder(R.drawable.ic_launcher)
-            .error(R.drawable.ic_launcher)
+            .placeholder(R.drawable.ic_audio_player)
+            .error(R.drawable.ic_audio_player)
             .into(play_bcg)
 
         play_title.text = it.title
@@ -158,6 +164,7 @@ class PlayActivity : AppCompatActivity() {
         play_album.text = it.album
 
         play_endText.text = search(it.id.toLong())
+        DataHolder.getInstance().currentTrack = it
     }
 
     private fun search(id: Long): String {
@@ -168,7 +175,8 @@ class PlayActivity : AppCompatActivity() {
         var status = "0:0"
 
         if (data?.isEmpty() != true) {
-            var finished = data!![0].duration.toDouble()
+            DataHolder.getInstance().currentSong = data!![0]
+            var finished = data[0].duration.toDouble()
             finished /= 1000.0
             finished /= 60.0
             val res = BigDecimal(finished).setScale(2, RoundingMode.HALF_EVEN)
@@ -188,15 +196,35 @@ class PlayActivity : AppCompatActivity() {
         Player.playList = list
 
         if (playImmediately && list.isNotEmpty() && songID < 0) {
-            Player.start(list[0].id)
+            playSong(list[0].id)
         }
 
         if (songID > 0) {
+            if (!isAlreadyPlaying()) playSong(songID.toString())
+        }
+    }
+
+    private fun isAlreadyPlaying(): Boolean {
+        var status = false
+        val holder = DataHolder.getInstance()
+        if (holder.isPlaying && holder.currentTrack?.id == songID.toString()) {
+            status = true
+        }
+
+        return status
+    }
+
+    private fun playSong(playID: String) {
+        if (!DataHolder.getInstance().ifFirstTime) {
             uiScope.launch {
                 delay(1000)
-                Player.start(songID.toString())
-                play_endText.text = search(songID)
+                Player.start(playID)
+                play_endText.text = search(playID.toLong())
             }
+            DataHolder.getInstance().ifFirstTime = true
+        } else {
+            Player.start(playID)
+            play_endText.text = search(playID.toLong())
         }
     }
 
@@ -224,7 +252,7 @@ class PlayActivity : AppCompatActivity() {
         type = intent.getStringExtra(Constants.Type.Type) ?: ""
         id = intent.getLongExtra(Constants.Songs.ID, 0)
         title = intent.getStringExtra(Constants.Songs.Name) ?: ""
-        playImmediately = intent.getBooleanExtra("requestForPlay", false)
+        playImmediately = intent.getBooleanExtra("playlist", false)
         songID = intent.getLongExtra(Constants.Songs.SONG_ID, -10L)
     }
 

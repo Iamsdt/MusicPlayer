@@ -14,7 +14,6 @@ import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Playlist
 import com.example.musicplayer.data.repo.ContentLiveData
 import com.example.musicplayer.data.repo.PlaylistRepository
-import com.example.musicplayer.ui.songs.SongActivity
 import com.example.musicplayer.utils.Constants
 import com.iamsdt.androidextension.MyCoroutineContext
 import com.iamsdt.androidextension.gone
@@ -27,10 +26,13 @@ import kotlinx.android.synthetic.main.playlist_dialogs.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
 
     private val uiScope = MyCoroutineContext()
+
+    private val vm: PlaylistVM by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +69,18 @@ class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
                 regularView()
                 //submit list to the adapter
                 adapter.submitList(it)
+            }
+        })
+
+        vm.isUpdated.observe(this, Observer {
+            it?.let {
+                val list = provider.getContentProviderValue()
+                if (list.isEmpty()) {
+                    emptyView()
+                } else {
+                    regularView()
+                    adapter.submitList(list)
+                }
             }
         })
 
@@ -126,7 +140,7 @@ class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
             Pair(Constants.Playlist.PlaylistName, model.name)
         )
 
-        nextActivity<SongActivity>(list = map)
+        nextActivity<PlayListDetails>(list = map)
     }
 
     override fun longClick(model: Playlist) {

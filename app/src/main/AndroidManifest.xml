@@ -30,6 +30,11 @@
             android:label="@string/title_activity_playlist"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".ui.playlist.PlayListDetails"
+            android:label="@string/title_activity_playlist"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <receiver android:name=".widget.PlayListWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

@@ -23,8 +23,8 @@ class ArtistVH(view: View) : RecyclerView.ViewHolder(view) {
         val uri = model.albumId.toUri()
         Glide.with(context)
             .load(uri)
-            .placeholder(R.drawable.ic_launcher)
-            .error(R.drawable.ic_launcher)
+            .placeholder(R.drawable.ic_audio_player)
+            .error(R.drawable.ic_audio_player)
             .into(img)
     }
 

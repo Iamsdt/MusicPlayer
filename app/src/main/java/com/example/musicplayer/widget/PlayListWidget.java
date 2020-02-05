@@ -10,7 +10,6 @@ import android.widget.RemoteViews;
 import com.example.musicplayer.R;
 import com.example.musicplayer.data.model.Playlist;
 import com.example.musicplayer.ui.play.PlayActivity;
-import com.example.musicplayer.ui.songs.SongActivity;
 import com.example.musicplayer.utils.Constants;
 import com.example.musicplayer.utils.SPUtils;
 
@@ -33,7 +32,7 @@ public class PlayListWidget extends AppWidgetProvider {
         wordIntent.putExtra(Constants.Type.Type, Constants.Type.TypePlaylist);
         wordIntent.putExtra(Constants.Songs.ID, playlist.getId());
         wordIntent.putExtra(Constants.Songs.Name, playlist.getName());
-        wordIntent.putExtra("requestForPlay", true);
+        wordIntent.putExtra("playlist", true);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, wordIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);

@@ -10,10 +10,11 @@
 
     <ImageView
         android:id="@+id/play_bcg"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
         android:contentDescription="@string/background_image_str"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitCenter" />
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -30,11 +31,13 @@
             android:ellipsize="end"
             android:gravity="center_horizontal"
             android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:shadowColor="@android:color/black"
             android:shadowRadius="20"
-            tools:text="This is example of line"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/fullscreen_line_color" />
+            android:textColor="@color/fullscreen_line_color"
+            tools:text="This is example of line" />
 
         <TextView
             android:id="@+id/play_artist"
@@ -45,6 +48,8 @@
             android:fontFamily="sans-serif-light"
             android:gravity="center_horizontal"
             android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:shadowColor="@android:color/black"
             android:shadowRadius="20"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -60,6 +65,8 @@
             android:fontFamily="sans-serif-light"
             android:gravity="center_horizontal"
             android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:shadowColor="@android:color/black"
             android:shadowRadius="20"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -71,8 +78,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:orientation="vertical"
             android:layout_marginBottom="50dp"
+            android:orientation="vertical"
             android:visibility="visible">
 
             <RelativeLayout
@@ -87,8 +94,8 @@
                     android:layout_marginStart="@dimen/text_view_margin"
                     android:gravity="center_vertical"
                     android:maxLines="1"
-                    tools:text="0.0"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white"
+                    tools:text="0.0" />
 
                 <SeekBar
                     android:id="@+id/seekBar1"
@@ -110,8 +117,8 @@
                     android:layout_marginEnd="@dimen/end_text_margin"
                     android:gravity="center_vertical"
                     android:maxLines="1"
-                    tools:text="0.0"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white"
+                    tools:text="0.0" />
 
             </RelativeLayout>
 
