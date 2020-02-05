@@ -60,7 +60,7 @@ class MusicService : MediaBrowserServiceCompat() {
     private val exoPlayer: ExoPlayer by lazy {
         ExoPlayerFactory.newSimpleInstance(this).apply {
             setAudioAttributes(_audioAttributes, true)
-            repeatMode = Player.REPEAT_MODE_ALL
+            repeatMode = Player.REPEAT_MODE_OFF
         }
     }
 
@@ -164,7 +164,7 @@ class MusicService : MediaBrowserServiceCompat() {
         clientPackageName: String,
         clientUid: Int,
         rootHints: Bundle?
-    ): MediaBrowserServiceCompat.BrowserRoot? {
+    ): BrowserRoot? {
         return BrowserRoot("Player", null)
 //        return BrowserRoot(UAMP_BROWSABLE_ROOT, null)
     }
@@ -176,7 +176,7 @@ class MusicService : MediaBrowserServiceCompat() {
      */
     override fun onLoadChildren(
         parentMediaId: String,
-        result: MediaBrowserServiceCompat.Result<List<MediaItem>>
+        result: Result<List<MediaItem>>
     ) {
         Log.d("rom", "onLoadChildren: $parentMediaId")
         // If the media source is ready, the results will be set synchronously here.

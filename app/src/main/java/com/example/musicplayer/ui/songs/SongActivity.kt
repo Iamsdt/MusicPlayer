@@ -10,12 +10,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Song
-import com.example.musicplayer.ext.toTrack
 import com.example.musicplayer.ui.main.ClickListener
 import com.example.musicplayer.ui.play.PlayActivity
 import com.example.musicplayer.utils.Constants
-import com.example.player.IPlayer
-import com.example.player.Player
 import com.iamsdt.androidextension.nextActivity
 import kotlinx.android.synthetic.main.activity_artist_list.*
 import kotlinx.android.synthetic.main.content_artist_list.*
@@ -27,10 +24,7 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
 
     private var title: String = ""
     private var type: String = ""
-    private var playImmediately = false
     private var id: Long = 0L
-
-    private val list: ArrayList<IPlayer.Track> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,14 +32,10 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
 
         loadTypeData(intent)
 
-        playImmediately = intent.getBooleanExtra("requestForPlay", false)
         //set title
         toolbar.title = title
         //set action toolbar
         setSupportActionBar(toolbar)
-
-        //init player
-        Player.init(this)
 
         //layout manager
         val manager = LinearLayoutManager(this)
@@ -62,7 +52,6 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
 
         vm.getSongs(id, type).observe(this, Observer {
             adapter.submitList(it)
-            preparePlayList(it)
         })
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -89,23 +78,12 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
     }
 
 
-    private fun preparePlayList(it: List<Song>?) {
-        //clear all previous data
-        list.clear()
-        it?.forEach { list.add(it.toTrack()) }
-        Player.playList = list
-
-        if (playImmediately && list.isNotEmpty()) {
-            Player.start(list[0].id)
-        }
-    }
-
-
     override fun click(model: Song) {
         val map = mapOf(
             Pair(Constants.Type.Type, type),
             Pair(Constants.Songs.ID, id),
             Pair(Constants.Songs.Name, title),
+            Pair("requestForPlay", true),
             Pair(Constants.Songs.SONG_ID, model.id)
         )
 
@@ -122,7 +100,14 @@ class SongActivity : AppCompatActivity(), ClickListener<Song> {
         if (item.itemId == android.R.id.home) {
             onBackPressed()
         } else if ((item.itemId == R.id.action_play)) {
-            Player.play()
+            val map = mapOf(
+                Pair(Constants.Type.Type, type),
+                Pair(Constants.Songs.ID, id),
+                Pair(Constants.Songs.Name, title),
+                Pair("requestForPlay", true)
+            )
+
+            nextActivity<PlayActivity>(list = map)
         }
 
         return super.onOptionsItemSelected(item)

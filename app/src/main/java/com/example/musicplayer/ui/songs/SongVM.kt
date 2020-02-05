@@ -44,4 +44,25 @@ class SongVM(private val context: Context) : ViewModel() {
     }
 
     fun getSong(songID: Long) = SongsRepository.getInstance(context)?.getSongForId(songID)
+    fun requestNewPLayList(id: Long, type: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (type) {
+                Constants.Type.TypeArtist -> {
+                    val list = ArtistsRepository.getInstance(context)?.getSongsForArtist(id)
+                    liveData.postValue(list)
+                }
+
+                Constants.Type.TypeAlbums -> {
+                    val list = AlbumsRepository.getInstance(context)?.getSongsForAlbum(id)
+                    liveData.postValue(list)
+                }
+
+                Constants.Type.TypePlaylist -> {
+                    val list = PlaylistRepository.getInstance(context)?.getSongsInPlaylist(id)
+                    liveData.postValue(list)
+                }
+            }
+
+        }
+    }
 }

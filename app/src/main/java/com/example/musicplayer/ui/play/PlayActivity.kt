@@ -2,6 +2,8 @@ package com.example.musicplayer.ui.play
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -12,9 +14,14 @@ import com.example.musicplayer.ui.songs.SongVM
 import com.example.musicplayer.utils.Constants
 import com.example.player.IPlayer
 import com.example.player.Player
+import com.iamsdt.androidextension.MyCoroutineContext
 import kotlinx.android.synthetic.main.activity_play.*
 import kotlinx.android.synthetic.main.content_play.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class PlayActivity : AppCompatActivity() {
 
@@ -28,18 +35,21 @@ class PlayActivity : AppCompatActivity() {
     private val vm: SongVM by viewModel()
 
     private val list: ArrayList<IPlayer.Track> = ArrayList()
+    private var songsList: List<Song>? = ArrayList()
+
+    private val mHandler: Handler = Handler()
+
+    private val uiScope = MyCoroutineContext()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play)
         setSupportActionBar(toolbar)
 
-        loadTypeData(intent)
+        Player.init(this)
 
-        //set title
-        toolbar.title = title
-        //set action toolbar
-        setSupportActionBar(toolbar)
+        loadTypeData(intent)
+        setUpActionbar(title)
 
         vm.getSongs(id, type).observe(this, Observer {
             preparePlayList(it)
@@ -49,17 +59,41 @@ class PlayActivity : AppCompatActivity() {
             drawUI(it)
         })
 
-        Player.progresLiveData.observe(this, Observer {
-            //todo implement
-        })
-
         Player.liveDataPlayerState.observe(this, Observer {
             togglePlayPauseIcon(it)
         })
 
         bindComponents()
+        activateSeekabr()
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        val newType = intent?.getStringExtra(Constants.Type.Type) ?: ""
+        val newID = intent?.getLongExtra(Constants.Songs.ID, 0) ?: 0
+        val newTitle = intent?.getStringExtra(Constants.Songs.Name) ?: ""
+        val newPlayImmediately = intent?.getBooleanExtra("requestForPlay", false) ?: false
+        val newSongID = intent?.getLongExtra(Constants.Songs.SONG_ID, -10L) ?: 0
+
+        if (id != newID) {
+            id = newID
+            vm.requestNewPLayList(id, newType)
+        }
+
+        if (newType != type) type = newType
+
+        if (title != newTitle) {
+            title = newTitle
+            setUpActionbar(title)
+        }
+
+        if (songID != newSongID) {
+            songID = newSongID
+            playImmediately = newPlayImmediately
+        }
     }
 
     private fun togglePlayPauseIcon(it: IPlayer.State?) {
@@ -103,6 +137,13 @@ class PlayActivity : AppCompatActivity() {
         }
     }
 
+    private fun setUpActionbar(title: String) {
+        //set title
+        toolbar.title = title
+        //set action toolbar
+        setSupportActionBar(toolbar)
+    }
+
     private fun drawUI(it: IPlayer.Track?) {
         if (it == null) return
 
@@ -115,22 +156,68 @@ class PlayActivity : AppCompatActivity() {
         play_title.text = it.title
         play_artist.text = it.artist
         play_album.text = it.album
-        play_endText.text = Player.trackDuration.toString()
+
+        play_endText.text = search(it.id.toLong())
+    }
+
+    private fun search(id: Long): String {
+        val data = songsList?.filter {
+            it.id == id
+        }
+
+        var status = "0:0"
+
+        if (data?.isEmpty() != true) {
+            var finished = data!![0].duration.toDouble()
+            finished /= 1000.0
+            finished /= 60.0
+            val res = BigDecimal(finished).setScale(2, RoundingMode.HALF_EVEN)
+            status = "$res"
+        }
+
+        return status
     }
 
     private fun preparePlayList(it: List<Song>?) {
+        //save songs list
+        songsList = it
+
         //clear all previous data
         list.clear()
         it?.forEach { list.add(it.toTrack()) }
         Player.playList = list
 
-        if (playImmediately && list.isNotEmpty()) {
+        if (playImmediately && list.isNotEmpty() && songID < 0) {
             Player.start(list[0].id)
         }
 
         if (songID > 0) {
-            Player.start(songID.toString())
+            uiScope.launch {
+                delay(1000)
+                Player.start(songID.toString())
+                play_endText.text = search(songID)
+            }
         }
+    }
+
+    private fun activateSeekabr() {
+        runOnUiThread(object : Runnable {
+            override fun run() {
+                if (Player.trackDuration != 0L) {
+                    val s = Player.currentPosition.toDouble()
+                    val f = Player.trackDuration.toDouble()
+                    val diff = (s / f) * 100
+                    seekBar1.progress = diff.toInt()
+                }
+
+                var start = Player.currentPosition.toDouble()
+                start /= 1000.0
+                start /= 60.0
+                val res = BigDecimal(start).setScale(2, RoundingMode.HALF_EVEN)
+                play_startText.text = "$res"
+                mHandler.postDelayed(this, 1000)
+            }
+        })
     }
 
     private fun loadTypeData(intent: Intent) {
@@ -139,6 +226,13 @@ class PlayActivity : AppCompatActivity() {
         title = intent.getStringExtra(Constants.Songs.Name) ?: ""
         playImmediately = intent.getBooleanExtra("requestForPlay", false)
         songID = intent.getLongExtra(Constants.Songs.SONG_ID, -10L)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 }
