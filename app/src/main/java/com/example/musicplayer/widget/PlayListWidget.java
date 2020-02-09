@@ -33,6 +33,7 @@ public class PlayListWidget extends AppWidgetProvider {
         wordIntent.putExtra(Constants.Songs.ID, playlist.getId());
         wordIntent.putExtra(Constants.Songs.Name, playlist.getName());
         wordIntent.putExtra("playlist", true);
+        wordIntent.putExtra("widget", true);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, wordIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);

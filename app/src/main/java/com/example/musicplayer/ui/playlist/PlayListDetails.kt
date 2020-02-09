@@ -34,6 +34,8 @@ class PlayListDetails : AppCompatActivity(), LongClickListener<Song> {
     private var type: String = ""
     private var id: Long = 0L
 
+    private var widget = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_artist_list)
@@ -69,6 +71,7 @@ class PlayListDetails : AppCompatActivity(), LongClickListener<Song> {
         type = intent.getStringExtra(Constants.Type.Type) ?: ""
         id = intent.getLongExtra(Constants.Playlist.PlaylistID, 0)
         title = intent.getStringExtra(Constants.Playlist.PlaylistName) ?: ""
+        widget = intent.getBooleanExtra("widget", false)
     }
 
 
@@ -94,7 +97,10 @@ class PlayListDetails : AppCompatActivity(), LongClickListener<Song> {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            if (widget) {
+                nextActivity<PlaylistActivity>()
+            } else
+                onBackPressed()
         } else if ((item.itemId == R.id.action_play)) {
             val map = mapOf(
                 Pair(Constants.Type.Type, type),

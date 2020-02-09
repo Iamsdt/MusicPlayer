@@ -1,8 +1,8 @@
 package com.example.musicplayer.ext
 
 import com.example.musicplayer.data.model.Song
+import com.example.musicplayer.service.IPlayer
 import com.example.musicplayer.utils.GeneralUtils
-import com.example.player.IPlayer
 
 fun Int.format(): String {
     return GeneralUtils.formatMilliseconds(this.toLong())

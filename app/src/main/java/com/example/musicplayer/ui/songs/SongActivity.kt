@@ -38,6 +38,8 @@ class SongActivity : AppCompatActivity(), LongClickListener<Song> {
     private var type: String = ""
     private var id: Long = 0L
 
+    private var savedString = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_artist_list)
@@ -64,6 +66,12 @@ class SongActivity : AppCompatActivity(), LongClickListener<Song> {
 
         vm.getSongs(id, type).observe(this, Observer {
             adapter.submitList(it)
+        })
+
+        vm.status.observe(this, Observer {
+            it?.let {
+                Toasty.success(this, "Successfully added to playlist").show()
+            }
         })
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -154,15 +162,7 @@ class SongActivity : AppCompatActivity(), LongClickListener<Song> {
                 showAddDialogPlaylistDialog()
             } else {
                 val play = mList[position - 1]
-                uiScope.launch(Dispatchers.IO) {
-                    val int = repo.addToPlaylist(play.id, listOf(model.id).toLongArray())
-                    if (int > 0) {
-                        withContext(Dispatchers.Main) {
-                            Toasty.success(this@SongActivity, "Songs added successfully")
-                                .show()
-                        }
-                    }
-                }
+                vm.addToPlaylist(play, model.id)
             }
 
         }

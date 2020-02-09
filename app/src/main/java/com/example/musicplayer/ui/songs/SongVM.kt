@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.musicplayer.data.model.Playlist
 import com.example.musicplayer.data.model.Song
 import com.example.musicplayer.data.repo.AlbumsRepository
 import com.example.musicplayer.data.repo.ArtistsRepository
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class SongVM(private val context: Context) : ViewModel() {
 
     private val liveData: MutableLiveData<List<Song>> = MutableLiveData()
+    val status = MutableLiveData<Boolean>()
 
     fun getSongs(id: Long, type: String): LiveData<List<Song>> {
         // post value
@@ -44,6 +46,7 @@ class SongVM(private val context: Context) : ViewModel() {
     }
 
     fun getSong(songID: Long) = SongsRepository.getInstance(context)?.getSongForId(songID)
+
     fun requestNewPLayList(id: Long, type: String) {
         viewModelScope.launch(Dispatchers.IO) {
             when (type) {
@@ -61,6 +64,18 @@ class SongVM(private val context: Context) : ViewModel() {
                     val list = PlaylistRepository.getInstance(context)?.getSongsInPlaylist(id)
                     liveData.postValue(list)
                 }
+            }
+
+        }
+    }
+
+    fun addToPlaylist(play: Playlist, songsID: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val id = PlaylistRepository.getInstance(context)
+                ?.addToPlaylist(play.id, listOf(songsID).toLongArray()) ?: 0
+
+            if (id > 0) {
+                status.postValue(true)
             }
 
         }

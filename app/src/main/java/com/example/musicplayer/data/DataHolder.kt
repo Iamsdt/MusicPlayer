@@ -1,7 +1,7 @@
 package com.example.musicplayer.data
 
 import com.example.musicplayer.data.model.Song
-import com.example.player.IPlayer
+import com.example.musicplayer.service.IPlayer
 
 class DataHolder {
 

@@ -1,4 +1,4 @@
-package com.example.player
+package com.example.musicplayer.service
 
 import android.app.PendingIntent
 import android.app.Service
@@ -19,16 +19,20 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import timber.log.Timber
 
-class MusicService : MediaBrowserServiceCompat() {
+class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaController: MediaControllerCompat
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
@@ -112,6 +116,8 @@ class MusicService : MediaBrowserServiceCompat() {
             it.setPlayer(exoPlayer)
             it.setPlaybackPreparer(playbackPreparer)
             it.setQueueNavigator(UampQueueNavigator(mediaSession))
+
+            exoPlayer.addListener(this)
         }
     }
 
@@ -293,6 +299,34 @@ class MusicService : MediaBrowserServiceCompat() {
             }
         }
     }
+
+
+    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+        super.onPlayerStateChanged(playWhenReady, playbackState)
+        when (playbackState) {
+            Player.STATE_READY -> {
+                musicPlayerState.postValue(Status.STATE_READY)
+            }
+
+            Player.STATE_ENDED -> {
+                //Timber.i("Play State: Player.STATE_ENDED")
+                musicPlayerState.postValue(Status.STATE_ENDED)
+            }
+        }
+    }
+
+    override fun onTracksChanged(
+        trackGroups: TrackGroupArray?,
+        trackSelections: TrackSelectionArray?
+    ) {
+        super.onTracksChanged(trackGroups, trackSelections)
+        //Timber.i("Play State: On Track changed")
+        musicPlayerState.postValue(Status.STATE_Tracks_Changed)
+    }
+
+    companion object {
+        val musicPlayerState = MutableLiveData<Status>()
+    }
 }
 
 /**
@@ -342,5 +376,6 @@ private class BecomingNoisyReceiver(
         }
     }
 }
+
 
 private const val UAMP_USER_AGENT = "uamp.next"

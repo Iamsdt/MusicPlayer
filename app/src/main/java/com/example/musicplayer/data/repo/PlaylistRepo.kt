@@ -12,7 +12,6 @@ import android.provider.MediaStore.Audio.PlaylistsColumns.NAME
 import android.util.Log
 import com.example.musicplayer.data.model.Playlist
 import com.example.musicplayer.data.model.Song
-import com.example.musicplayer.ext.ContentProviderLiveData
 import com.example.musicplayer.ext.toList
 import com.example.musicplayer.utils.SettingsUtility
 
