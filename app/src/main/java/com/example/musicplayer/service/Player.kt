@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -118,9 +117,6 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
                         State.PAUSE -> {
                             prepareFromMediaId(playNowIdNew, extra)
                         }
-                        else -> {
-                            //nothing to do
-                        }
                     }
                 } else {
                     stop()
@@ -142,7 +138,6 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
             }
         }
     }
-
 
     override fun pause() {
         controls {
@@ -228,7 +223,7 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
             mediaController = MediaControllerCompat(appContext, mediaBrowser.sessionToken).apply {
                 registerCallback(MediaControllerCallback())
             }
-            _liveDataPlayerState.postValue(State.CREATED)
+            _liveDataPlayerState.postValue(State.STOP)
         }
 
         /**
@@ -244,8 +239,6 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
         override fun onConnectionFailed() {
             _liveDataPlayerState.postValue(State.ERROR)
         }
-
-
     }
 
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
@@ -255,17 +248,13 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
                 PlaybackStateCompat.STATE_ERROR -> State.ERROR
                 PlaybackStateCompat.STATE_PAUSED -> State.PAUSE
                 PlaybackStateCompat.STATE_PLAYING -> State.PLAY
-                PlaybackStateCompat.STATE_SKIPPING_TO_NEXT -> State.SKIP_TO_NEXT
-                PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS -> State.SKIP_TO_PREVIOUS
-                PlaybackStateCompat.STATE_STOPPED -> State.STOP
-                PlaybackStateCompat.STATE_NONE -> State.NONE
+                PlaybackStateCompat.STATE_STOPPED, PlaybackStateCompat.STATE_NONE -> State.STOP
                 else -> null
             }
             s?.takeIf { it != _liveDataPlayerState.value }?.also {
                 _liveDataPlayerState.postValue(it)
             }
         }
-
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
             val item = _liveDataPlayList.value?.find { it.id == metadata?.description?.mediaId }
@@ -282,19 +271,6 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
          */
         override fun onSessionDestroyed() {
             mediaBrowserConnectionCallback.onConnectionSuspended()
-            //distoryed
-            val s = State.DISTORTED
-            s.takeIf { it != _liveDataPlayerState.value }?.also {
-                _liveDataPlayerState.postValue(it)
-            }
-        }
-
-        override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
-            super.onQueueChanged(queue)
-            val s = State.CHANGED
-            s.takeIf { it != _liveDataPlayerState.value }?.also {
-                _liveDataPlayerState.postValue(it)
-            }
         }
     }
 }

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.musicplayer.MainActivity
 import com.example.musicplayer.R
 import com.example.musicplayer.data.model.Playlist
 import com.example.musicplayer.data.repo.ContentLiveData
@@ -174,7 +175,7 @@ class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            nextActivity<MainActivity>(finish = true)
         } else if (item.itemId == R.id.action_add) {
             showPlaylistDialog()
         }

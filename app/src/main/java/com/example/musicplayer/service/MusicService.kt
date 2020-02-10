@@ -12,15 +12,14 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaDescriptionCompat
-import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
+import com.example.musicplayer.utils.SecCountManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
@@ -41,6 +40,8 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
     //    private lateinit var mediaSource: MusicSource
     private lateinit var mediaSessionConnector: MediaSessionConnector
 
+    private var secCountManager: SecCountManager? = null
+
     private var isForegroundService = false
 
 
@@ -56,6 +57,7 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
             repeatMode = Player.REPEAT_MODE_OFF
         }
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -106,9 +108,7 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
                 this, Util.getUserAgent(this, UAMP_USER_AGENT), null
             )
 
-            // Create the PlaybackPreparer of the media session connector.
             val playbackPreparer = UampPlaybackPreparer(
-//                mediaSource,
                 exoPlayer,
                 dataSourceFactory
             )
@@ -116,16 +116,14 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
             it.setPlayer(exoPlayer)
             it.setPlaybackPreparer(playbackPreparer)
             it.setQueueNavigator(UampQueueNavigator(mediaSession))
-
-            exoPlayer.addListener(this)
         }
+
+        exoPlayer.addListener(this)
+
+        secCountManager = SecCountManager.getInstance(this)
     }
 
-    /**
-     * This is the code that causes UAMP to stop playing when swiping it away from recents.
-     * The choice to do this is app specific. Some apps stop playback, while others allow playback
-     * to continue and allow uses to stop it with the notification.
-     */
+
     override fun onTaskRemoved(rootIntent: Intent) {
         super.onTaskRemoved(rootIntent)
 
@@ -146,19 +144,13 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
         }
     }
 
-    /**
-     * Returns the "root" media ID that the client should request to get the list of
-     * [MediaItem]s to browse/play.
-     *
-     * TODO: Allow different roots based on which app is attempting to connect.
-     */
+
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot? {
         return BrowserRoot("Player", null)
-//        return BrowserRoot(UAMP_BROWSABLE_ROOT, null)
     }
 
     /**
@@ -171,32 +163,6 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
         result: Result<List<MediaItem>>
     ) {
         Log.d("rom", "onLoadChildren: $parentMediaId")
-        // If the media source is ready, the results will be set synchronously here.
-//        val resultsSent = mediaSource.whenReady { successfullyInitialized ->
-//            if (successfullyInitialized) {
-////                val children = browseTree[parentMediaId]?.map { item ->
-////                    MediaItem(item.description, item.flag)
-////                }
-//                val children = mediaSource.map { item ->
-//                    MediaItem(item.description, item.flag)
-//                }
-//        val children = com.example.android.uamp.media.Player.instance.mediaItems
-//        result.sendResult(children)
-//        Log.d("rom", "sendResult: $children")
-//            } else {
-//                result.sendError(null)
-//            }
-//        }
-//
-//        // If the results are not ready, the service must "detach" the results before
-//        // the method returns. After the source is ready, the lambda above will run,
-//        // and the caller will be notified that the results are ready.
-//        //
-//        // See [MediaItemFragmentViewModel.subscriptionCallback] for how this is passed to the
-//        // UI/displayed in the [RecyclerView].
-//        if (!resultsSent) {
-//            result.detach()
-//        }
     }
 
     /**
@@ -228,11 +194,6 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
      * - Calls [Service.startForeground] and [Service.stopForeground].
      */
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
-        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            mediaController.playbackState?.also { updateNotification(it) }
-        }
-
-
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             state?.also { updateNotification(it) }
         }
@@ -303,29 +264,37 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         super.onPlayerStateChanged(playWhenReady, playbackState)
-        when (playbackState) {
-            Player.STATE_READY -> {
-                musicPlayerState.postValue(Status.STATE_READY)
-            }
+        if (playWhenReady && playbackState == Player.STATE_READY) {
+            Timber.i("Play State: Player.STATE_READY and playWhenReady")
+        }
 
-            Player.STATE_ENDED -> {
-                //Timber.i("Play State: Player.STATE_ENDED")
-                musicPlayerState.postValue(Status.STATE_ENDED)
-            }
+        if (playbackState == Player.STATE_ENDED) {
+            Timber.i("Play State: Player.STATE_ENDED")
+            Timber.i("Play State: End Tracking ${exoPlayer.duration}")
+            secCountManager?.endTracking()
+        }
+    }
+
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
+        if (!isPlaying) {
+            Timber.i("Play State: Player.PAUSED")
+            Timber.i("Play State: End Tracking ${exoPlayer.contentPosition}")
+            secCountManager?.endTracking()
+        } else {
+            Timber.i("Play State: Player.Playing")
+            Timber.i("Play State: Start Tracking ${exoPlayer.currentPosition}")
+            val title = mediaController.metadata.description.title
+            secCountManager?.startTracking(title.toString(), exoPlayer.currentPosition)
         }
     }
 
     override fun onTracksChanged(
-        trackGroups: TrackGroupArray?,
-        trackSelections: TrackSelectionArray?
+        trackGroups: TrackGroupArray,
+        trackSelections: TrackSelectionArray
     ) {
         super.onTracksChanged(trackGroups, trackSelections)
-        //Timber.i("Play State: On Track changed")
-        musicPlayerState.postValue(Status.STATE_Tracks_Changed)
-    }
-
-    companion object {
-        val musicPlayerState = MutableLiveData<Status>()
+        secCountManager?.endTracking()
     }
 }
 

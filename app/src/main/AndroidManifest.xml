@@ -32,10 +32,6 @@
             android:parentActivityName=".ui.main.MainUIActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service
-            android:name=".service.MusicService"
-            android:exported="false" />
-
         <activity
             android:name=".ui.playlist.PlayListDetails"
             android:label="@string/title_activity_playlist"
@@ -81,6 +77,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.MusicService"
+            android:enabled="true"
+            android:exported="true"
+            tools:ignore="ExportedService">
+
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <!--
+             MediaSession, prior to API 21, uses a broadcast receiver to communicate with a
+             media session. It does not have to be this broadcast receiver, but it must
+             handle the action "android.intent.action.MEDIA_BUTTON".
+
+             Additionally, this is used to resume the service from an inactive state upon
+             receiving a media button event (such as "play").
+        -->
+        <receiver android:name="androidx.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

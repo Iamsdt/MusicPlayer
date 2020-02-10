@@ -11,13 +11,10 @@ import com.example.musicplayer.data.DataHolder
 import com.example.musicplayer.data.model.Song
 import com.example.musicplayer.ext.toTrack
 import com.example.musicplayer.service.IPlayer
-import com.example.musicplayer.service.MusicService
 import com.example.musicplayer.service.Player
-import com.example.musicplayer.service.Status
 import com.example.musicplayer.ui.playlist.PlayListDetails
 import com.example.musicplayer.ui.songs.SongVM
 import com.example.musicplayer.utils.Constants
-import com.example.musicplayer.utils.SecCountManager
 import com.iamsdt.androidextension.MyCoroutineContext
 import com.iamsdt.androidextension.nextActivity
 import com.squareup.picasso.Picasso
@@ -26,7 +23,6 @@ import kotlinx.android.synthetic.main.content_play.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
@@ -45,7 +41,6 @@ class PlayActivity : AppCompatActivity() {
     private val vm: SongVM by viewModel()
 
     private val list: ArrayList<IPlayer.Track> = ArrayList()
-    private var songsList: List<Song>? = ArrayList()
 
     private val mHandler: Handler = Handler()
 
@@ -60,16 +55,12 @@ class PlayActivity : AppCompatActivity() {
     private var isPlaying = false
     private var currentSongID = -10
 
-    private var secManager: SecCountManager? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play)
         setSupportActionBar(toolbar)
 
         Player.init(this)
-
-        secManager = SecCountManager.getInstance(this)
 
         loadTypeData(intent)
         setUpActionbar(title)
@@ -89,31 +80,7 @@ class PlayActivity : AppCompatActivity() {
         bindComponents()
         activateSeekabr()
 
-        MusicService.musicPlayerState.observe(this, Observer {
-            it?.let {
-                fileSaver(it)
-            }
-        })
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun fileSaver(it: Status) {
-        when (it) {
-            Status.STATE_READY -> {
-                Timber.i("Play State: Player.STATE_Ready")
-            }
-            Status.STATE_ENDED -> {
-                secManager?.endTracking(Player.trackDuration)
-                Timber.i("Play State: Player.STATE_ENDED")
-            }
-            Status.STATE_Tracks_Changed -> {
-                if (stateReady) {
-                    secManager?.endTracking(Player.currentPosition)
-                    Timber.i("Play State: Player.STATE_Tracks_Changed")
-                }
-            }
-        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -151,7 +118,6 @@ class PlayActivity : AppCompatActivity() {
             IPlayer.State.PLAY -> {
                 play_pause.setImageDrawable(getDrawable(R.drawable.uamp_ic_pause_white_48dp))
                 isPlaying = true
-                Timber.i("Play State: PLAY")
                 stateReady = true
             }
 
@@ -161,7 +127,6 @@ class PlayActivity : AppCompatActivity() {
                 isPlaying = false
                 endDate = Date()
                 finishTime = Player.currentPosition
-                Timber.i("Play State: Pause")
                 stateReady = false
             }
 
@@ -179,7 +144,6 @@ class PlayActivity : AppCompatActivity() {
                 endDate = Date()
                 finishTime = Player.currentPosition
                 isPlaying = false
-                secManager?.endTracking(Player.currentPosition)
             }
 
             IPlayer.State.PREPARING -> {
@@ -193,11 +157,6 @@ class PlayActivity : AppCompatActivity() {
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        secManager?.endTracking(Player.currentPosition)
-    }
-
 
     private fun bindComponents() {
         play_pause.setOnClickListener {
@@ -206,29 +165,10 @@ class PlayActivity : AppCompatActivity() {
 
         next.setOnClickListener {
             Player.next()
-            endDate = Date()
-            finishTime = Player.currentPosition
-
-            if (isAlreadyPlaying()) {
-                secManager?.endTracking(Player.currentPosition)
-                stateReady = false
-            }
         }
 
         prev.setOnClickListener {
             Player.prev()
-            endDate = Date()
-            finishTime = Player.currentPosition
-            if (isAlreadyPlaying()) {
-                secManager?.endTracking(Player.currentPosition)
-                stateReady = false
-                //start tracking again
-                try {
-                    secManager?.startTracking(songTitle, Player.currentPosition)
-                } catch (e: Exception) {
-                    Timber.i("Play State: Tracking error on $songTitle")
-                }
-            }
         }
     }
 
@@ -259,13 +199,6 @@ class PlayActivity : AppCompatActivity() {
         DataHolder.getInstance().currentTrack = it
 
         currentSongID = it.id.toInt()
-
-        Timber.i("Play State: UI DRAW")
-        try {
-            secManager?.startTracking(songTitle, 0)
-        } catch (e: Exception) {
-            Timber.i("Play State: Tracking error on $songTitle")
-        }
     }
 
     private fun search(id: Long): String {
@@ -375,16 +308,9 @@ class PlayActivity : AppCompatActivity() {
                     Pair("widget", true)
                 )
 
-                if (!isPlaying) {
-                    secManager?.endTracking(Player.currentPosition)
-                }
-
                 nextActivity<PlayListDetails>(list = map)
 
             } else {
-                if (!isPlaying) {
-                    secManager?.endTracking(Player.currentPosition)
-                }
                 onBackPressed()
             }
         }
@@ -394,5 +320,6 @@ class PlayActivity : AppCompatActivity() {
     companion object {
         private var songTitle = ""
         var stateReady = false
+        var songsList: List<Song>? = ArrayList()
     }
 }

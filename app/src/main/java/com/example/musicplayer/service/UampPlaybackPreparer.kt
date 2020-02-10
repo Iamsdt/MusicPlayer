@@ -26,12 +26,19 @@ class UampPlaybackPreparer(
     private val dataSourceFactory: DataSource.Factory
 ) : MediaSessionConnector.PlaybackPreparer {
 
+
+    override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle) {
+
+    }
+
     override fun getSupportedPrepareActions(): Long =
         PlaybackStateCompat.ACTION_PREPARE_FROM_MEDIA_ID or
                 PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
 
 
-    override fun onPrepare() = Unit
+    override fun onPrepare(playWhenReady: Boolean) {
+        //nothing to da
+    }
 
     /**
      * Handles callbacks to both [MediaSessionCompat.Callback.onPrepareFromMediaId]
@@ -43,7 +50,8 @@ class UampPlaybackPreparer(
      * [MediaSessionCompat.Callback.onPlayFromMediaId], otherwise it's
      * [MediaSessionCompat.Callback.onPrepareFromMediaId].
      */
-    override fun onPrepareFromMediaId(mediaId: String?, extras: Bundle?) {
+
+    override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle) {
         val metadataList =
             com.example.musicplayer.service.Player.playList?.map { it.toMediaMetadata() }
                 ?: emptyList()
@@ -52,76 +60,40 @@ class UampPlaybackPreparer(
         }
         if (itemToPlay == null) {
             Log.w(TAG, "Content not found: MediaID=$mediaId")
-
-            // TODO: Notify caller of the error.
         } else {
             val mediaSource = metadataList.toMediaSource(dataSourceFactory)
-//            (mediaSource as ConcatenatingMediaSource).
-            // Since the playlist was probably based on some ordering (such as tracks
-            // on an album), find which window index to play first so that the song the
-            // user actually wants to hear plays first.
             val initialWindowIndex = metadataList.indexOf(itemToPlay)
-            val seekTo = if (extras?.getBoolean("needSeekTo") == true)
+            val seekTo = if (extras.getBoolean("needSeekTo"))
                 com.example.musicplayer.service.Player.currentPosition
             else 0
             exoPlayer.prepare(mediaSource)
+            exoPlayer.playWhenReady = playWhenReady
             exoPlayer.seekTo(initialWindowIndex, seekTo)
         }
     }
 
     private fun setSpeed(speed: Float) {
-        exoPlayer.playbackParameters = PlaybackParameters(speed)
-    }
-
-    /**
-     * Handles callbacks to both [MediaSessionCompat.Callback.onPrepareFromSearch]
-     * *AND* [MediaSessionCompat.Callback.onPlayFromSearch] when using [MediaSessionConnector].
-     * (See above for details.)
-     *
-     * This method is used by the Google Assistant to respond to requests such as:
-     * - Play Geisha from Wake Up on UAMP
-     * - Play electronic music on UAMP
-     * - Play music on UAMP
-     *
-     * For details on how search is handled, see [AbstractMusicSource.search].
-     */
-    override fun onPrepareFromSearch(query: String?, extras: Bundle?) {
-//        musicSource.whenReady {
-//            val metadataList = musicSource.search(query ?: "", extras ?: Bundle.EMPTY)
-//            if (metadataList.isNotEmpty()) {
-//                val mediaSource = metadataList.toMediaSource(dataSourceFactory)
-//                exoPlayer.prepare(mediaSource)
-//            }
-//        }
+        exoPlayer.setPlaybackParameters(PlaybackParameters(speed))
     }
 
     override fun onCommand(
-        player: Player?,
-        controlDispatcher: ControlDispatcher?,
-        command: String?,
-        extras: Bundle?,
-        cb: ResultReceiver?
+        player: Player,
+        controlDispatcher: ControlDispatcher,
+        command: String,
+        extras: Bundle,
+        cb: ResultReceiver
     ): Boolean {
         when (command) {
-            COMMAND_SPEED -> setSpeed(extras?.getFloat(COMMAND_SPEED, 1F) ?: 1F)
+            COMMAND_SPEED -> setSpeed(extras.getFloat(COMMAND_SPEED, 1F))
         }
-
         return true
     }
 
-    override fun onPrepareFromUri(uri: Uri?, extras: Bundle?) = Unit
 
+    override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle) {
 
-    //    /**
-//     * Builds a playlist based on a [MediaMetadataCompat].
-//     *
-//     * TODO: Support building a playlist by artist, genre, etc...
-//     *
-//     * @param item Item to base the playlist on.
-//     * @return a [List] of [MediaMetadataCompat] objects representing a playlist.
-//     */
-//    private fun buildPlaylist(item: MediaMetadataCompat): List<MediaMetadataCompat> =
-//            musicSource.filter { it.album == item.album }.sortedBy { it.trackNumber }
+    }
+
     companion object {
         const val COMMAND_SPEED = "speed"
     }

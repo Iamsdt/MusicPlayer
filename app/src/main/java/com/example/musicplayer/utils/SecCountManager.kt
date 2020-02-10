@@ -8,6 +8,7 @@ import java.io.FileNotFoundException
 import java.io.FileWriter
 import java.io.IOException
 import java.util.*
+import kotlin.math.abs
 
 class SecCountManager(val context: Context) {
 
@@ -26,22 +27,21 @@ class SecCountManager(val context: Context) {
     fun startTracking(title: String, currentStreamPosition: Long) {
         if (curSecCount != null) {
             Timber.e("SEC_COUNT", "We are currently tracking another SEC_COUNT")
-            throw IllegalArgumentException("We are currently tracking another Second Count")
         }
         curSecCount = SecCount(
             title,
             currentStreamPosition,
-            context
+            context, Date()
         )
         Timber.i("Play State: Tracking")
     }
 
-    fun endTracking(currentStreamPosition: Long) {
+    fun endTracking() {
         if (curSecCount == null) {
             return
         }
         Timber.i("Play State: Hey I am saving file")
-        curSecCount!!.endSecCount(currentStreamPosition)
+        curSecCount!!.endSecCount(0)
         curSecCount!!.writeToFile()
         curSecCount = null
     }
@@ -50,9 +50,9 @@ class SecCountManager(val context: Context) {
 internal class SecCount(
     val songId: String,
     val startPos: Long,
-    val context: Context
+    val context: Context,
+    val startTime: Date
 ) {
-    val startTime: Date = Date()
     var endPos: Long = 0
     var endTime: Date? = null
 
@@ -73,8 +73,14 @@ internal class SecCount(
     }
 
     fun writeToFile() {
+        endPos = abs(startTime.time - endTime!!.time)
+
+        if (endPos < startPos) {
+            endPos += startPos
+        }
+
         Timber.w(
-            "SEC_COUNT", "Log Sec Count: Song: " + songId +
+            "SEC_COUNT" + "Log Sec Count: Song: " + songId +
                     " Pos: " + startPos + " - " + endPos +
                     " Time: " + startTime.toString() + " - " + endTime.toString()
         )
