@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.MenuItem
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.musicplayer.R
@@ -25,10 +26,12 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PlayActivity : AppCompatActivity() {
+class PlayActivity : AppCompatActivity(), SeekListener {
 
     private var title: String = ""
     private var type: String = ""
@@ -199,6 +202,7 @@ class PlayActivity : AppCompatActivity() {
         DataHolder.getInstance().currentTrack = it
 
         currentSongID = it.id.toInt()
+        //seekBar1?.max = (Player.trackDuration).toInt()
     }
 
     private fun search(id: Long): String {
@@ -272,20 +276,54 @@ class PlayActivity : AppCompatActivity() {
         runOnUiThread(object : Runnable {
             override fun run() {
                 if (Player.trackDuration != 0L) {
-                    val s = Player.currentPosition.toDouble()
-                    val f = Player.trackDuration.toDouble()
+                    val s = Player.currentPosition / 1000.0
+                    val f = Player.trackDuration / 1000.0
                     val diff = (s / f) * 100
                     seekBar1.progress = diff.toInt()
                 }
 
-                var start = Player.currentPosition.toDouble()
-                start /= 1000.0
-                start /= 60.0
-                val res = BigDecimal(start).setScale(2, RoundingMode.HALF_EVEN)
-                play_startText.text = "$res"
+                val start = Player.currentPosition
+                play_startText.text = getDate(start)
                 mHandler.postDelayed(this, 1000)
             }
         })
+
+        seekBar1.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+
+            var user = false
+            var p = 0
+
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                user = fromUser
+                p = progress
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                if (user) {
+                    val pro = seekBar?.progress ?: 1
+                    val f = Player.trackDuration / 1000.0
+                    var current = (f * pro) / 100.0
+                    current *= 1000 //ms
+                    Player.seekTo(current.toLong())
+                    user = false
+                }
+            }
+
+        })
+    }
+
+    private fun getDate(date: Long): String {
+        val dateTime = Date(date)
+
+        var formatter: DateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
+        if (date > 3600000L) {
+            formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        }
+        formatter.timeZone = TimeZone.getTimeZone("UTC")
+        return formatter.format(dateTime)
     }
 
     private fun loadTypeData(intent: Intent) {
@@ -321,5 +359,9 @@ class PlayActivity : AppCompatActivity() {
         private var songTitle = ""
         var stateReady = false
         var songsList: List<Song>? = ArrayList()
+    }
+
+    override fun seekTo(seek: Long) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

@@ -18,7 +18,9 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
+import com.example.musicplayer.ui.play.PlayActivity
 import com.example.musicplayer.utils.SecCountManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player
@@ -261,6 +263,9 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
         }
     }
 
+    fun seekTo(seek: Long) {
+        exoPlayer.seekTo(seek)
+    }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         super.onPlayerStateChanged(playWhenReady, playbackState)

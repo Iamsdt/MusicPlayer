@@ -101,10 +101,9 @@ internal class SecCount(
                 Environment.DIRECTORY_DOWNLOADS + " secCount.txt File not found. Did you" +
                         " add a WRITE_EXTERNAL_STORAGE permission to the manifest?"
             )
-            throw RuntimeException(e)
         } catch (e: IOException) {
             e.printStackTrace()
-            throw RuntimeException(e)
+            //throw RuntimeException(e)
         }
     }
 
