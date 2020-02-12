@@ -24,10 +24,15 @@ class SecCountManager(val context: Context) {
     }
 
     private var curSecCount: SecCount? = null
-    fun startTracking(title: String, currentStreamPosition: Long) {
+    fun startTracking(
+        title: String,
+        currentStreamPosition: Long
+    ) {
         if (curSecCount != null) {
             Timber.e("SEC_COUNT", "We are currently tracking another SEC_COUNT")
+            return
         }
+
         curSecCount = SecCount(
             title,
             currentStreamPosition,

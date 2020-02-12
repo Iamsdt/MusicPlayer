@@ -18,9 +18,8 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
-import com.example.musicplayer.ui.play.PlayActivity
+import com.example.musicplayer.data.DataHolder
 import com.example.musicplayer.utils.SecCountManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player
@@ -263,10 +262,6 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
         }
     }
 
-    fun seekTo(seek: Long) {
-        exoPlayer.seekTo(seek)
-    }
-
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         super.onPlayerStateChanged(playWhenReady, playbackState)
         if (playWhenReady && playbackState == Player.STATE_READY) {
@@ -289,8 +284,13 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
         } else {
             Timber.i("Play State: Player.Playing")
             Timber.i("Play State: Start Tracking ${exoPlayer.currentPosition}")
-            val title = mediaController.metadata.description.title
-            secCountManager?.startTracking(title.toString(), exoPlayer.currentPosition)
+            val uri = mediaController.metadata.description.mediaUri.toString()
+            val name = uri.split("/")
+            val title = name[name.size - 1]
+            secCountManager?.startTracking(
+                title,
+                exoPlayer.currentPosition
+            )
         }
     }
 

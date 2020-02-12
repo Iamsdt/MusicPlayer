@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PlayActivity : AppCompatActivity(), SeekListener {
+class PlayActivity : AppCompatActivity() {
 
     private var title: String = ""
     private var type: String = ""
@@ -359,9 +359,5 @@ class PlayActivity : AppCompatActivity(), SeekListener {
         private var songTitle = ""
         var stateReady = false
         var songsList: List<Song>? = ArrayList()
-    }
-
-    override fun seekTo(seek: Long) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
