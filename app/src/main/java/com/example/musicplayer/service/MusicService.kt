@@ -19,7 +19,6 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
-import com.example.musicplayer.data.DataHolder
 import com.example.musicplayer.utils.SecCountManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player
