@@ -1,6 +1,6 @@
 # Music Player
 
-This project use the UI of old universal music player. With some additional functionality. This is an complete music player app with playlist options. In this project exoplayer is for music play. This app support latest android 10.
+A complete music player with playlist options. In this project the UI of old universal music player is used, but the layout created with new component of android like constrain layout, card view. For this project, exoplayer is for music play. This app support latest android 10.
 
 
 
