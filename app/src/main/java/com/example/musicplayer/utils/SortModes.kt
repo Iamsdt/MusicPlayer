@@ -4,6 +4,8 @@ import android.provider.MediaStore
 import com.example.musicplayer.data.model.Album
 import com.example.musicplayer.data.model.Artist
 import com.example.musicplayer.data.model.Song
+import java.util.*
+import kotlin.Comparator
 
 object SortModes {
     class SongModes {
@@ -24,6 +26,7 @@ object SortModes {
         companion object {
             const val ALBUM_DEFAULT = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER
             const val ALBUM_A_Z = MediaStore.Audio.Albums.ALBUM
+            const val ALBUM_SONGS_LIST = "${MediaStore.Audio.Albums.NUMBER_OF_SONGS} DESC"
             const val ALBUM_Z_A = "$ALBUM_A_Z DESC"
             const val ALBUM_YEAR = "${MediaStore.Audio.Albums.FIRST_YEAR} DESC"
         }
@@ -34,6 +37,8 @@ object SortModes {
             const val ARTIST_DEFAULT = MediaStore.Audio.Artists.DEFAULT_SORT_ORDER
             const val ARTIST_A_Z = MediaStore.Audio.Artists.ARTIST
             const val ARTIST_Z_A = "$ARTIST_A_Z DESC"
+            const val ARTIST_SONGS_LIST = "${MediaStore.Audio.Artists.NUMBER_OF_TRACKS} DESC"
+            const val ARTIST_Album_LIST = "${MediaStore.Audio.Artists.Albums.NUMBER_OF_SONGS_FOR_ARTIST} DESC"
         }
     }
 
@@ -41,7 +46,7 @@ object SortModes {
         when (sortMode) {
             SongModes.SONG_A_Z -> Thread {
                 songList.sortWith(Comparator { a, b ->
-                    a.title.toUpperCase().compareTo(b.title.toUpperCase())
+                    a.title.toUpperCase(Locale.getDefault()).compareTo(b.title.toUpperCase())
                 })
             }.start()
             SongModes.SONG_Z_A -> Thread {

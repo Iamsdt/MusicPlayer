@@ -82,7 +82,7 @@ public final class SettingsUtility {
     }
 
     public String getAlbumSortOrder() {
-        return sPreferences.getString(ALBUM_SORT_ORDER_KEY, SortModes.AlbumModes.ALBUM_A_Z);
+        return sPreferences.getString(ALBUM_SORT_ORDER_KEY, SortModes.AlbumModes.ALBUM_SONGS_LIST);
     }
 
     public void setAlbumSortOrder(String value) {
@@ -122,7 +122,7 @@ public final class SettingsUtility {
     }
 
     public String getArtistSortOrder() {
-        return sPreferences.getString(ARTIST_SORT_ORDER_KEY, SortModes.ArtistModes.ARTIST_A_Z);
+        return sPreferences.getString(ARTIST_SORT_ORDER_KEY, SortModes.ArtistModes.ARTIST_Album_LIST);
     }
 
     public void setArtistSortOrder(String value) {

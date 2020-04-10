@@ -1,5 +1,6 @@
 package com.example.musicplayer.ui.songs
 
+import SongsRepository
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +12,6 @@ import com.example.musicplayer.data.repo.AlbumsRepository
 import com.example.musicplayer.data.repo.ArtistsRepository
 import com.example.musicplayer.data.repo.PlaylistRepository
 import com.example.musicplayer.utils.Constants
-import com.iamsdt.musicplayer.data.repository.SongsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -54,18 +54,15 @@ class SongVM(private val context: Context) : ViewModel() {
                     val list = ArtistsRepository.getInstance(context)?.getSongsForArtist(id)
                     liveData.postValue(list)
                 }
-
                 Constants.Type.TypeAlbums -> {
                     val list = AlbumsRepository.getInstance(context)?.getSongsForAlbum(id)
                     liveData.postValue(list)
                 }
-
                 Constants.Type.TypePlaylist -> {
                     val list = PlaylistRepository.getInstance(context)?.getSongsInPlaylist(id)
                     liveData.postValue(list)
                 }
             }
-
         }
     }
 
@@ -77,7 +74,17 @@ class SongVM(private val context: Context) : ViewModel() {
             if (id > 0) {
                 status.postValue(true)
             }
+        }
+    }
 
+    fun addToTopPlaylist(play: Playlist, songsID: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val id = PlaylistRepository.getInstance(context)
+                ?.addToTopPlaylist(play.id, listOf(songsID).toLongArray()) ?: 0
+
+            if (id > 0) {
+                status.postValue(true)
+            }
         }
     }
 }

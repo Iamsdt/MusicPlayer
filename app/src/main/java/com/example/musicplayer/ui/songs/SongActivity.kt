@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -22,12 +23,14 @@ import com.iamsdt.androidextension.nextActivity
 import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_artist_list.*
 import kotlinx.android.synthetic.main.content_artist_list.*
+import kotlinx.android.synthetic.main.playlist_add_dialogs.view.*
 import kotlinx.android.synthetic.main.playlist_dialogs.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
+
 
 class SongActivity : AppCompatActivity(), LongClickListener<Song> {
 
@@ -136,39 +139,51 @@ class SongActivity : AppCompatActivity(), LongClickListener<Song> {
     }
 
     override fun longClick(model: Song) {
-        showPlaylistDialog(model)
+        showAddDialogs(model)
     }
 
-    private fun showPlaylistDialog(model: Song) {
+    private fun showAddDialogs(model: Song) {
+        val builder = AlertDialog.Builder(this)
+        val view = LayoutInflater.from(this).inflate(
+            R.layout.playlist_add_dialogs, songs_root, false
+        )
 
         val repo = getInstance(this)!!
-
         val mList = repo.getPlayLists()
-
-        val list = ArrayList<String>()
-        list.add("Create new list")
-
+        val arrayList = ArrayList<String>()
+        arrayList.add("Create a new playlist")
         for ((_, name) in mList) {
-            list.add(name)
+            arrayList.add(name)
         }
+        val arrayAdapter: ArrayAdapter<String> =
+            ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayList)
 
-        val cs = list.toTypedArray<CharSequence>()
+        view.playlist_list.adapter = arrayAdapter
 
-        val builder =
-            AlertDialog.Builder(this)
-        builder.setTitle("Select a playlist")
-        builder.setItems(cs) { _, position ->
-            if (position == 0) {
+        builder.setView(view)
+        val dialog = builder.create()
+
+        view.playlist_list.setOnItemClickListener { _, _, position, _ ->
+            if (position==0){
                 showAddDialogPlaylistDialog()
-            } else {
-                val play = mList[position - 1]
-                vm.addToPlaylist(play, model.id)
+            } else{
+                val status = view.switch1.isChecked
+                val playListID = mList[position-1]
+
+                if (status){
+                    vm.addToTopPlaylist(playListID, model.id)
+                } else{
+                    vm.addToPlaylist(playListID, model.id)
+                }
             }
 
+            if (dialog.isShowing) {
+                dialog.dismiss()
+            }
         }
 
-        val dialog = builder.create()
         dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     private fun showAddDialogPlaylistDialog() {
@@ -197,6 +212,7 @@ class SongActivity : AppCompatActivity(), LongClickListener<Song> {
         }
 
         dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
 }

@@ -51,6 +51,9 @@ object Player : IPlayer {
     override fun prev() = playerImpl.prev()
     override fun togglePlayPause() = playerImpl.togglePlayPause()
     override fun seekTo(millis: Long) = playerImpl.seekTo(millis)
+    override fun setRepeatMode(mode: Int) {
+        playerImpl.setRepeatMode(mode)
+    }
 }
 
 private class PlayerImpl(private val appContext: Context) : IPlayer {
@@ -164,14 +167,28 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
                 skipToNext()
             }
         } else {
-            playList?.takeIf { it.size > 1 }?.also { list ->
-                liveDataPlayNow.value?.also { track ->
-                    val next = list.indexOf(track).takeIf { i -> i != -1 }
-                        ?.let { if (it == list.size - 1) 0 else it + 1 }
-                        ?.let { list[it] }
-                    _liveDataPlayNow.postValue(next)
+            if (playList?.isNotEmpty() == true) {
+                val currentTrack: IPlayer.Track? = liveDataPlayNow.value
+                var index = playList?.indexOf(currentTrack) ?: -1
+                if (index != -1) {
+                    if (index == playList?.size ?: 0 - 1){
+                        index = 0;
+                    } else{
+                        index += 1
+                    }
+
+                    _liveDataPlayNow.postValue(playList?.get(index))
                 }
             }
+
+//            playList?.takeIf { it.size > 1 }?.also { list ->
+//                liveDataPlayNow.value?.also { track ->
+//                    val next = list.indexOf(track).takeIf { i -> i != -1 }
+//                        ?.let { if (it == list.size - 1) 0 else it + 1 }
+//                        ?.let { list[it] }
+//                    _liveDataPlayNow.postValue(next)
+//                }
+//            }
         }
     }
 
@@ -204,6 +221,12 @@ private class PlayerImpl(private val appContext: Context) : IPlayer {
     override fun seekTo(millis: Long) {
         controls {
             seekTo(millis)
+        }
+    }
+
+    override fun setRepeatMode(mode: Int) {
+        controls {
+            setRepeatMode(mode)
         }
     }
 

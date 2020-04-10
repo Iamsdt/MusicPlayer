@@ -41,4 +41,9 @@ class PlaylistVM(val context: Context) : ViewModel() {
         return songs
     }
 
+    fun reorder(id: Long, fromPos: Int, toPos: Int) {
+        val status = PlaylistRepository.getInstance(context)?.reorderMedia(id, fromPos, toPos)
+        println(status)
+    }
+
 }

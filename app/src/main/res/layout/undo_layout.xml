@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Developed By Shudipto Trafder
+  ~  on 8/21/18 9:47 PM
+  ~  Copyright (c) 2018  Shudipto Trafder.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/red_300"
+    android:orientation="horizontal"
+    android:foreground="?android:attr/selectableItemBackground"
+    tools:targetApi="m"
+    tools:ignore="UnusedAttribute"
+    android:weightSum="3">
+
+    <TextView
+        android:id="@+id/undo_deleteTxt"
+        tools:ignore="HardcodedText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/listPreferredItemHeight"
+        android:contentDescription="undo button"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_weight="2"
+        android:text="Audio will be removed"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+
+
+    <TextView
+        android:id="@+id/undoBtn"
+        tools:ignore="HardcodedText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/listPreferredItemHeight"
+        android:contentDescription="undo button"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:text="Undo"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+
+</LinearLayout>

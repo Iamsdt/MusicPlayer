@@ -1,5 +1,3 @@
-package com.iamsdt.musicplayer.data.repository
-
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor

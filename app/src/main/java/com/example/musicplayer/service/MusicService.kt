@@ -54,7 +54,7 @@ class MusicService : MediaBrowserServiceCompat(), Player.EventListener {
     private val exoPlayer: ExoPlayer by lazy {
         ExoPlayerFactory.newSimpleInstance(this).apply {
             setAudioAttributes(_audioAttributes, true)
-            repeatMode = Player.REPEAT_MODE_OFF
+            repeatMode = Player.REPEAT_MODE_ALL
         }
     }
 

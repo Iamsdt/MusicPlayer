@@ -24,4 +24,5 @@
     <!-- Text color -->
     <color name="text_color">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="red_300">#EE2315</color>
 </resources>

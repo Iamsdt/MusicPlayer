@@ -1,5 +1,6 @@
 package com.example.musicplayer.ui.playlist
 
+import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+
 class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
 
     private val uiScope = MyCoroutineContext()
@@ -41,6 +43,8 @@ class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
         setSupportActionBar(toolbar)
         //add observer to coroutines
         lifecycle.addObserver(uiScope)
+
+        loadTypeData(intent)
 
         //text
         playlist_text.setOnClickListener {
@@ -96,6 +100,26 @@ class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    private fun loadTypeData(intent: Intent) {
+        val type = intent.getStringExtra(Constants.Type.Type) ?: ""
+        val id = intent.getLongExtra(Constants.Playlist.PlaylistID, 0)
+        val title = intent.getStringExtra(Constants.Playlist.PlaylistName) ?: ""
+        val playImmediately = intent.getBooleanExtra("playlist", false)
+        val widget = intent.getBooleanExtra("widget", false)
+
+        if (widget) {
+            val map = mapOf(
+                Pair(Constants.Type.Type, type),
+                Pair(Constants.Playlist.PlaylistID, id),
+                Pair(Constants.Playlist.PlaylistName, title),
+                Pair("playlist", playImmediately),
+                Pair("widget", widget)
+            )
+
+            nextActivity<PlayListDetails>(list = map)
+        }
+    }
+
     private fun showPlaylistDialog() {
         val builder = AlertDialog.Builder(this)
         val view = LayoutInflater.from(this).inflate(
@@ -122,6 +146,7 @@ class PlaylistActivity : AppCompatActivity(), LongClickListener<Playlist> {
         }
 
         dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     private fun regularView() {

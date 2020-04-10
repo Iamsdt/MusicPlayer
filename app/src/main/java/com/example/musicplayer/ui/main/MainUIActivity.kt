@@ -1,6 +1,7 @@
 package com.example.musicplayer.ui.main
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -17,6 +18,7 @@ import com.example.musicplayer.data.MainListItem
 import com.example.musicplayer.ui.albums.AlbumActivity
 import com.example.musicplayer.ui.artist.ArtistListActivity
 import com.example.musicplayer.ui.playlist.PlaylistActivity
+import com.example.musicplayer.utils.Constants
 import com.google.android.material.navigation.NavigationView
 import com.iamsdt.androidextension.nextActivity
 import kotlinx.android.synthetic.main.activity_main_ui.*
@@ -31,6 +33,8 @@ class MainUIActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_ui)
         setSupportActionBar(main_toolbar)
+
+        loadTypeData(intent)
 
         //layout manager
         val manager = LinearLayoutManager(this)
@@ -65,6 +69,27 @@ class MainUIActivity : AppCompatActivity(),
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+    }
+
+    private fun loadTypeData(intent: Intent) {
+        val type = intent.getStringExtra(Constants.Type.Type) ?: ""
+        val id = intent.getLongExtra(Constants.Playlist.PlaylistID, 0)
+        val title = intent.getStringExtra(Constants.Playlist.PlaylistName) ?: ""
+        val playImmediately = intent.getBooleanExtra("playlist", false)
+        val widget = intent.getBooleanExtra("widget", false)
+
+        if (widget) {
+            val map = mapOf(
+                Pair(Constants.Type.Type, type),
+                Pair(Constants.Playlist.PlaylistID, id),
+                Pair(Constants.Playlist.PlaylistName, title),
+                Pair("playlist", playImmediately),
+                Pair("widget", widget)
+            )
+
+            nextActivity<PlaylistActivity>(list = map)
+        }
+
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

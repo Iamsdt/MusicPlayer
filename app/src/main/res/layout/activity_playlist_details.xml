@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.play.PlayActivity">
+    android:id="@+id/songs_root"
+    tools:context=".ui.artist.ArtistListActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -20,6 +21,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_exo_player" />
+    <include layout="@layout/content_playlist_details" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

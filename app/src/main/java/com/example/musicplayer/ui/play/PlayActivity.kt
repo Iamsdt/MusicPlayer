@@ -3,6 +3,7 @@ package com.example.musicplayer.ui.play
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.support.v4.media.session.PlaybackStateCompat
 import android.view.MenuItem
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
@@ -232,6 +233,7 @@ class PlayActivity : AppCompatActivity() {
         list.clear()
         it?.forEach { list.add(it.toTrack()) }
         Player.playList = list
+        Player.setRepeatMode(PlaybackStateCompat.REPEAT_MODE_ALL)
 
         if (playImmediately && list.isNotEmpty() && songID < 0) {
             playSong(list[0].id)
@@ -337,20 +339,7 @@ class PlayActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            if (widget) {
-                //nextActivity<MainActivity>()
-                val map = mapOf(
-                    Pair(Constants.Type.Type, type),
-                    Pair(Constants.Playlist.PlaylistID, id),
-                    Pair(Constants.Playlist.PlaylistName, title),
-                    Pair("widget", true)
-                )
-
-                nextActivity<PlayListDetails>(list = map)
-
-            } else {
-                onBackPressed()
-            }
+            onBackPressed()
         }
         return super.onOptionsItemSelected(item)
     }

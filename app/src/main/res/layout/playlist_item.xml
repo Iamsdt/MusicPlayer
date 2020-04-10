@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Developed By Shudipto Trafder
+  ~  on 8/21/18 9:46 PM
+  ~  Copyright (c) 2018  Shudipto Trafder.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Swipe Layout-->
+    <include
+        android:id="@+id/swipeLayout"
+        layout="@layout/undo_layout" />
+
+    <!-- Regular Layout-->
+    <include
+        android:id="@+id/regular_layout"
+        layout="@layout/list_item" />
+
+</FrameLayout>

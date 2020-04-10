@@ -41,7 +41,8 @@ class ArtistsRepository() : ArtistsRepositoryInterface {
 
     override fun getAllArtist(): List<Artist> {
         val albumList =
-            makeArtistCursor(null, null).toList(true, Artist.Companion::createFromCursor)
+            makeArtistCursor(null, null).
+                toList(true, Artist.Companion::createFromCursor)
         getArtists(albumList)
         return albumList
     }
@@ -106,7 +107,7 @@ class ArtistsRepository() : ArtistsRepositoryInterface {
             arrayOf("_id", "album", "artist", "numsongs", "minyear"),
             null,
             null,
-            SortModes.AlbumModes.ALBUM_A_Z
+            MediaStore.Audio.Artists.Albums.NUMBER_OF_SONGS
         )
     }
 
@@ -119,12 +120,12 @@ class ArtistsRepository() : ArtistsRepositoryInterface {
             arrayOf("artist_id", "_id", "artist", "numsongs"),
             selection,
             paramArrayOfString,
-            "artist_id"
+            "numsongs"
         )
     }
 
     private fun makeArtistSongCursor(artistId: Long): Cursor? {
-        val artistSongSortOrder = SortModes.SongModes.SONG_A_Z
+        val artistSongSortOrder = SortModes.SongModes.SONG_LAST_ADDED
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val selection = "is_music=1 AND title != '' AND artist_id=$artistId"
         return contentResolver.query(

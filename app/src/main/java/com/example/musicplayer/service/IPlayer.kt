@@ -22,6 +22,7 @@ interface IPlayer {
     fun prev()
     fun togglePlayPause()
     fun seekTo(millis: Long)
+    fun setRepeatMode(mode: Int)
 
     data class Track @JvmOverloads constructor(
         val id: String,

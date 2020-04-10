@@ -1,0 +1,16 @@
+1. Albums orders => number of songs (descending order) //complete
+2. Artist orders => By albums (descending order) //complete
+3. repeating mode => Repeat all the songs //done
+4. Widget bugs => back to playlist and back to playlist and select new songs //complete
+5. Back arrow => from widget back arrow show some wired activity, now it's fixed //complete
+6. Reorder playlist => reorder with drag and drop //complete
+7. Delete music from playlist => swap to delete is added // complete
+8. Redesign UI
+    => music ui
+    => create playlist dialogs
+    => songs added playlist dialogs //complete
+9. Music added
+    => now music can be added at the bottom by default
+    => in the songs added dialogs a switch button is provided
+    need to switch to add songs in the top //complete
+10. Time Tracking => time was not tracking during lock screen //complete

@@ -14,6 +14,7 @@ import com.example.musicplayer.data.model.Playlist
 import com.example.musicplayer.data.model.Song
 import com.example.musicplayer.ext.toList
 import com.example.musicplayer.utils.SettingsUtility
+import timber.log.Timber
 
 interface PlaylistRepositoryInterface {
     @Throws(IllegalStateException::class)
@@ -102,8 +103,39 @@ class PlaylistRepository() : PlaylistRepositoryInterface {
             numInserted += contentResolver.bulkInsert(uri, bulkValues)
             offset += 1000
         }
-
+        Timber.i("Inserted at position: $numInserted $base")
         return numInserted
+    }
+
+    fun addToTopPlaylist(playlistId: Long, ids: LongArray): Int {
+        val projection = arrayOf("max($PLAY_ORDER)")
+        val uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId)
+
+        val base: Int = contentResolver.query(uri, projection, null, null, null)?.use {
+            if (it.moveToFirst()) {
+                it.getInt(0) + 1
+            } else {
+                0
+            }
+        } ?: throw IllegalStateException("Unable to query $uri, system returned null.")
+
+        var numInserted = 0
+        var offset = 0
+        while (offset < ids.size) {
+            val bulkValues = makeInsertItems(ids, offset, 1000, base)
+            numInserted += contentResolver.bulkInsert(uri, bulkValues)
+            offset += 1000
+        }
+
+        val status = reorderMedia(playlistId, base-1, 0)
+        Timber.i("Inserted at top: $status")
+
+        Timber.i("Inserted at position: $numInserted $base")
+        return numInserted
+    }
+
+    fun reorderMedia(playlistId: Long, from: Int, to: Int): Boolean {
+        return MediaStore.Audio.Playlists.Members.moveItem(contentResolver, playlistId, from, to)
     }
 
     override fun getSongsInPlaylist(playlistId: Long): List<Song> {
@@ -161,7 +193,8 @@ class PlaylistRepository() : PlaylistRepositoryInterface {
         try {
             return contentResolver.query(
                 EXTERNAL_CONTENT_URI,
-                arrayOf(_ID, NAME), null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER
+                arrayOf(_ID, NAME), null, null,
+                "${MediaStore.Audio.Playlists.Members.DATE_MODIFIED} DESC"
             )
         } catch (ex: SecurityException) {
             Log.println(Log.ERROR, "Exception", ex.message!!)
@@ -182,7 +215,7 @@ class PlaylistRepository() : PlaylistRepositoryInterface {
                 arrayOf(_ID),
                 "${MediaStore.Audio.AudioColumns.TITLE} != ''",
                 null,
-                null
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER
             )?.use {
                 if (it.moveToFirst()) {
                     it.count
@@ -236,7 +269,7 @@ class PlaylistRepository() : PlaylistRepositoryInterface {
             arrayOf(AUDIO_ID),
             null,
             null,
-            MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER
+            "${MediaStore.Audio.Playlists._ID} DESC"
         )?.use {
             if (it.moveToFirst()) {
                 it.count
@@ -267,7 +300,7 @@ class PlaylistRepository() : PlaylistRepositoryInterface {
             projection,
             selection.toString(),
             null,
-            MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER
+            MediaStore.Audio.Playlists.Members.PLAY_ORDER
         )
     }
 
@@ -292,3 +325,6 @@ class PlaylistRepository() : PlaylistRepositoryInterface {
         return contentValuesList.toTypedArray()
     }
 }
+
+//asnwer
+//https://stackoverflow.com/questions/8252878/alternative-to-mediastore-playlists-members-moveitem

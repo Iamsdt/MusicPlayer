@@ -96,7 +96,7 @@ class AlbumsRepository() : AlbumsRepositoryInterface {
             arrayOf("_id", "title", "artist", "album", "duration", "track", "artist_id", "_data"),
             selection,
             null,
-            ""
+            "track"
         )
     }
 }
